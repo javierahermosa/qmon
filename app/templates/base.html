@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% block head %}
+    	<title>Qbite Begins{% block title %}{% endblock %}</title>
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<meta name="description" content="">
+    	<meta name="keywords" content="">
+    	<meta name="author" content="Javiera Guedes">
+    	<meta charset="utf-8">
+		
+  	  	<link rel="stylesheet" type="text/css" 
+		      href="{{ url_for('static', filename='css/datepicker.css') }}">
+		<link type="text/css" rel="stylesheet" 
+		      href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+	    <link rel="stylesheet" 
+	          href="{{ url_for('static', filename='css/bootstrap-responsive.css') }}" >
+	    <link rel="shortcut icon" 
+	          href="{{ url_for('static', filename='ico/qbite.ico') }}">		
+		<link rel='stylesheet' type='text/css' 
+		      href='http://fonts.googleapis.com/css?family=Share+Tech+Mono' >
+  	  	<link rel="stylesheet" 
+  	  		  href="{{ url_for('static', filename='css/my.css') }}" >		
+		{% endblock %}	  		    
+	</head>
+    <body>
+      <div id="header">{% block header %}{% endblock %}</div>
+      <div id="messages-wrap">
+        <div id="messages">
+          {% for category, msg in get_flashed_messages(with_categories=true) %}
+            <p class="message flash-{{ category }}">{{ msg }}</p>
+          {% endfor %}
+        </div>
+      </div>
+      <div id="content">{% block content %}{% endblock %}</div>
+      <div id="footer">{% block footer %}{% endblock %}</div>
+    </body>
+  </html>
