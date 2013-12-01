@@ -1,6 +1,6 @@
 from flask.ext.wtf import Form, RecaptchaField
 from wtforms import TextField, PasswordField, BooleanField, FloatField, validators
-from wtforms.validators import Required, EqualTo, Email, Length
+from wtforms.validators import Required, EqualTo, Email, Length, NumberRange
 from werkzeug.datastructures import MultiDict
 
 class LoginForm(Form):
@@ -22,8 +22,8 @@ class RegisterForm(Form):
 class DataForm(Form):
     date = TextField('Date')
     description = TextField('Description')
-    amount = FloatField('Amount')
-    earned = BooleanField('Earned!')
+    amount = FloatField('Amount', [NumberRange(min=0)])
+    earned = BooleanField('This was earned!')
 
 class SettingsForm(Form):
     change_name = TextField('Name',[Length(min=4, max=15)])

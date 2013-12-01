@@ -60,80 +60,63 @@ def check_balances():
     if partner1 and not partner2:
          balances['ts'] = balances['ts_user'] + balances['ts_p1']
          balances['te'] = balances['te_user'] + balances['te_p1']
-        
-         if balances['t_user'] < balances['t_p1']:
+         if balances['ts_user'] < balances['ts_p1']:
              balances['ower'] = user.name
              balances['receiver'] = partner1.name
-             balances['amount_owned'] = 0.5 * (balances['t_p1'] - balances['t_user'])
          else:
              balances['ower'] = partner1.name
              balances['receiver'] = user.name
-             balances['amount_owned'] = 0.5 * (balances['t_user'] - balances['t_p1'])
-             
+         balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p1'] + balances['te'])    
+         balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])      
+         
     elif partner1 and partner2:
          balances['ts'] = balances['ts_user'] + balances['ts_p1'] + balances['ts_p2']
          balances['te'] = balances['te_user'] + balances['te_p1'] + balances['te_p2']
          
-         mean = 0.3333333*(balances['t_user'] + balances['t_p1'] + balances['t_p2'])
-         diff_u = mean - balances['t_user']
-         diff_p1 = mean - balances['t_p1']
-         diff_p2 = mean - balances['t_p2']    
+         mean = 0.3333333*(balances['ts'] - balances['te'])
+         diff_u = mean - balances['ts_user']
+         diff_p1 = mean - balances['ts_p1']
+         diff_p2 = mean - balances['ts_p2']    
          
-         big_spender = min(balances['t_user'], balances['t_p1'], balances['t_p2'])
-         if big_spender == balances['t_user']: 
-             balances['ower'] = user.name
-             if abs(diff_p1) > abs(diff_p2):
-                 balances['amount_owned'] = diff_p1
-                 balances['receiver'] = partner1.name
-                 balances['amount_owned2'] = diff_p2
-                 balances['receiver2'] = partner2.name  
-             else:
-                 balances['amount_owned'] = diff_p2
-                 balances['receiver'] = partner2.name
-                 balances['amount_owned2'] = diff_p1
-                 balances['receiver2'] = partner1.name    
-         elif big_spender == balances['t_p1']: 
+         big_spender = min(balances['ts_user'], balances['ts_p1'], balances['ts_p2'])
+         if big_spender == balances['ts_user']: 
+             balances['receiver'] = user.name    
              balances['ower'] = partner1.name
-             if abs(diff_u) > abs(diff_p2):
-                 balances['amount_owned'] = diff_u
-                 balances['receiver'] = user.name
-                 balances['amount_owned2'] = diff_p2
-                 balances['receiver2'] = partner2.name  
-             else:
-                 balances['amount_owned'] = diff_p2
-                 balances['receiver'] = partner2.name
-                 balances['amount_owned2'] = diff_u
-                 balances['receiver2'] = user.name
+             balances['amount_owned'] = diff_p1
+             balances['ower2'] = partner2.name 
+             balances['amount_owned2'] = diff_p2
+         elif big_spender == balances['ts_p1']: 
+             balances['receiver'] = partner1.name
+             balances['ower'] = user.name
+             balances['amount_owned'] = diff_u
+             balances['ower2'] = partner2.name 
+             balances['amount_owned2'] = diff_p2 
          else: 
-             balances['ower'] = partner2.name
-             if abs(diff_u) > abs(diff_p1):
-                 balances['amount_owned'] = diff_u
-                 balances['receiver'] = user.name
-                 balances['amount_owned2'] = diff_p1
-                 balances['receiver2'] = partner1.name  
-             else:
-                 balances['amount_owned'] = diff_p1
-                 balances['receiver'] = partner1.name
-                 balances['amount_owned2'] = diff_u
-                 balances['receiver2'] = user.name
-              
+            balances['receiver'] = partner2.name
+            balances['ower'] = user.name
+            balances['amount_owned'] = diff_u
+            balances['ower2'] = partner1.name 
+            balances['amount_owned2'] = diff_p1
+         balances['surplus'] = 0.333333 * (balances['te'] - balances['ts'])  
+               
     elif not partner1 and partner2:
          balances['ts'] = balances['ts_user'] + balances['ts_p2']
          balances['te'] = balances['te_user'] + balances['te_p2']
-         if balances['t_user'] < balances['t_p2']:
+         if balances['ts_user'] < balances['ts_p2']:
              balances['ower'] = user.name
-             balances['receiver'] = p2.name
-             balances['amount_owned'] = 0.5 * (balances['t_p2'] - balances['t_user'])
+             balances['receiver'] = partner2.name
          else:
              balances['ower'] = partner2.name
              balances['receiver'] = user.name
-             balances['amount_owned'] = 0.5 * (balances['t_user'] - balances['t_p2'])
+         balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p2'] + balances['te'])  
+         balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])  
     else:
          balances['ts'] = balances['ts_user'] 
          balances['te'] = balances['te_user'] 
+         balances['amount_owned'] = 0.0
+         balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])  
          
     balances['tot'] =  balances['te'] -  balances['ts']
-    #return total_spent_user, total_earned_user, total_spent_partner1, partner1.name, partner1.id
     return balances, partner1, partner2
     
 @mod.route('/me/')
@@ -228,10 +211,11 @@ def logout():
 @mod.route('/delete/<int:entry_id>')
 def delete_entry(entry_id):
     trans = Account.query.filter_by(trans_id=entry_id).first()
-    db.session.delete(trans)
-    db.session.commit()
+    if trans.user_id == session['user_id']:
+        db.session.delete(trans)
+        db.session.commit()
+    else: flash('Oops, you can only delete your own entries.', 'delete')
     return redirect(url_for('users.profile'))
-    
 @requires_login
 @mod.route('/settings/', methods=['GET', 'POST'])
 def settings():

@@ -109,6 +109,36 @@
 	     $('.table').tablesorter();
 
 	   });
-	      </script> 		
+	      </script> 	
+		     <script>  
+			 var $btn2 = $('#popover');
+			 $btn2.data('state', 'hover');
+
+			 var enterShow = function () {
+			     if ($btn2.data('state') === 'hover') {
+			         $btn2.popover('show');
+			     }
+			 };
+			 var exitHide = function () {
+			     if ($btn2.data('state') === 'hover') {
+			         $btn2.popover('hide');
+			     }
+			 };
+
+			 var clickToggle = function () {
+			     if ($btn2.data('state') === 'hover') {
+			         $btn2.data('state', 'pinned');
+			     } else {
+			         $btn2.data('state', 'hover')
+			         $btn.popover('hover');
+			     }
+			 };
+
+			 $btn2.popover({trigger: 'manual'})
+			     .on('mouseenter', enterShow)
+			     .on('mouseleave', exitHide)
+			     .on('click', clickToggle);
+		 
+		    </script> 	
     </body>
   </html>
