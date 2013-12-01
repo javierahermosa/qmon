@@ -4,7 +4,7 @@ _basedir = os.path.abspath(os.path.dirname(__file__))
 DEBUG = False
 
 ADMINS = frozenset(['javiereahermosa@yahoo.com'])
-SECRET_KEY = 'SecretKeyForSessionSigning'
+SECRET_KEY = 'NOTRATISDEMETERTELOCO'
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(_basedir, 'app.db')
 DATABASE_CONNECT_OPTIONS = {}

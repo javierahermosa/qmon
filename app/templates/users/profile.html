@@ -1,4 +1,183 @@
- {% extends "base.html" %}
- {% block content %}
-   Hi {{ user.name }}!
- {% endblock %}
+{% extends "base.html" %}
+{% block headtitle %} - Profile{% endblock %}
+{% block title %} Qomon{% endblock %}
+
+{% block content %}
+
+ 	
+{% with errors = get_flashed_messages(category_filter=["partner1"]) %}
+{% if errors %}
+<div class="alert-message block-message error">
+  <a class="close" href="#">×</a>
+  <ul>
+    {%- for msg in errors %}
+    <li>{{ msg }}</li>
+    {% endfor -%}
+  </ul>
+</div>
+{% endif %}
+{% endwith %}
+    <div class="row">
+      <div class="col-6 col-sm-6 col-lg-14">
+		  <h3 class="text-mutted text-left">  Add a new entry </h3>
+
+		  {% from "forms/macros.html" import render_field %}
+		  <form role="form" class="form form-medium" action="." method="post">
+		  {{ form.csrf_token }}
+		  	  <div class="form-group">
+				  <p> Transaction date or leave blank for today: <p>
+		  {{ render_field(form.date, class="form-control input-small text datepicker") }}
+      </div>
+      <div class="form-group">
+		  <p> Amount spent or earned: <p>
+		  {{ render_field(form.amount, class="form-control input-small text") }}
+      </div>
+      <div class="form-group">
+		  <p> Describe the transaction: <p>
+		  {{ render_field(form.description, class="form-control input-large text") }}
+      </div>
+
+		  {{ render_field(form.earned, class="input checkbox") }}
+		  <button type="submit" class="btn btn-success">Add</button>
+		  </form>
+    
+	
+      </div><!--/span-->
+         
+      <div class="col-5 col-sm-6 col-lg-5">
+  		<h3>Summary</h3>
+		<div class="col-lg-5 col-sm-10 content"  style="background-color:#F0F0F0 ">
+	    
+			<table class="table-responsive">
+			
+				<tr>
+					<td><h3 class="text-left"><strong>{{user}}</strong> total:&nbsp;&nbsp;</h3></td>
+					<td></td>
+					<td class="text-success"><h3 class="text-right">{{ '%.2f' % bal['t_user']}}</h3></td>
+					<td > &nbsp;&nbsp;<h5 class="glyphicon glyphicon-info-sign text-muted"></h5></td>
+				</tr>
+				{%  if p1 %}
+				<tr>
+					<td><h3 class="text-left"><strong>{{p1.name}}</strong> total: </h3></td>
+					<td>&nbsp;</td>
+					<td class="text-success"><h3 class="text-right">{{ '%.2f' % bal['t_p1']}}</h3></td>
+				</tr>
+				{% endif %}
+				{%  if p2 %}
+				<tr>
+					<td><h3 class="text-left"><strong>{{p2.name}}</strong> total: </h3></td>
+					<td>&nbsp;</td>
+					<td class="text-success"><h3 class="text-right">{{'%.2f' % bal['t_p2']}}</h3></td>
+				</tr>
+				{% endif %}
+			    {% if not p1 or not p2 %}
+				<tr>
+					<td>
+				    <a class="text-muted" href="{{ url_for('users.settings') }}">
+					<span class="glyphicon glyphicon-plus-sign text-muted"></span> Add Partner</a> 
+				</td>
+				</tr>
+				{% endif %}
+				
+				<tr>
+					
+					<td><h3 class="text-left">Balance:</h3></td>
+					<td></td>
+					<td class="text-success"><h3 class="text-right"><strong>{{'%.2f' % bal['tot']}}</strong></h3></td>
+				</tr>
+				{% if p1 %}
+				<tr>
+					<td><h3 class="text-left"><em>{{bal['ower']}} owns {{bal['receiver']}}:</em></h3></td>
+					<td></td>
+					<td class="text-warning"><h3 class="text-right"><em><strong>{{ '%.2f' % bal['amount_owned']}}</strong></em></h3></td>
+				</tr>
+				{% endif %}
+				{% if p2 %}
+				<tr>
+					<td><h3 class="text-left"><em>{{bal['ower']}} owns {{bal['receiver2']}}:</em></h3></td>
+					<td></td>
+					<td class="text-warning"><h3 class="text-right"><em><strong>{{'%.2f' % bal['amount_owned2']}}</strong></em></h3></td>
+				</tr>
+				{% endif %}
+				
+			</table>
+	        <p>&nbsp;</p>
+		</div>
+ 
+	</div>
+       
+      </div><!--/span-->
+      
+
+<hr>  <!--horizontal line-->
+<div class="table-responsive">
+	<table class="table table-striped tablesorter" id="account-table">
+		<thead>
+			<tr>
+ 				<th>#</th>
+ 				<th>Who   <span class="caret"></span>
+</th>
+ 				<th>Date   <span class="caret"></th>
+ 				<th>Description   <span class="caret"></th>
+ 				<th>Spent <span class="caret"></th>
+ 				<th>Earned <span class="caret"> </th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+		{% for entry in entries %}   
+		   <tr class=entries>	
+			 <td> {{loop.index}} </td>
+			    <td>{{user}}</td>			
+	             <td>{{entry.date}}</td>
+				<td>{{entry.description}}</td>
+				{% if entry.spent > 0 %}
+				<td>$ {{ '%.2f' % entry.spent}}</td>
+				{% else %}
+				<td class="muted"> </td>
+				{% endif %}
+				{% if entry.credit > 0 %}
+				<td class="text-success">$ {{'%.2f' % entry.credit}}</td>
+				{% else %}
+				<td class="text-success"> </td>
+				{% endif %}
+				<td>
+					<span class="glyphicon glyphicon-pencil"></span>
+				
+				    <a href="{{ url_for('users.delete_entry',entry_id=entry.trans_id) }}">
+					<span class="glyphicon glyphicon-trash"></span></a> 
+				</td>
+		
+		     </tr>
+		  {% endfor %}
+		  
+  		{% for p_entry in p_entries %}   
+  		   <tr class=entries>	
+  			 <td> {{loop.index}} </td>
+  			    <td>{{p1.name}}</td>			
+  	             <td>{{p_entry.date}}</td>
+  				<td>{{p_entry.description}}</td>
+  				{% if p_entry.spent > 0 %}
+  				<td>$ {{'%.2f' % p_entry.spent}}</td>
+  				{% else %}
+  				<td class="muted"> </td>
+  				{% endif %}
+  				{% if p_entry.credit > 0 %}
+  				<td class="text-success">$ {{ '%.2f' % p_entry.credit}}</td>
+  				{% else %}
+  				<td class="text-success"> </td>
+  				{% endif %}
+  				<td>
+  					<span class="glyphicon glyphicon-pencil"></span>
+				
+  				    <a href="{{ url_for('users.delete_entry',entry_id=p_entry.trans_id) }}">
+  					<span class="glyphicon glyphicon-trash"></span></a> 
+  				</td>
+		
+  		     </tr>
+  		  {% endfor %}
+	      </tbody>
+	</table>
+	
+{% endblock %}
