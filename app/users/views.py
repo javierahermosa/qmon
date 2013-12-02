@@ -34,46 +34,47 @@ def check_balances():
     if partner1:
         total_spent_partner1 = (db.session.query(func.sum(Account.spent))\
                             .filter_by(user_id=partner1.id).first())[0]
-        total_earned_partner1 = (db.session.query(func.sum(Account.credit))\
-                            .filter_by(user_id=partner1.id).first())[0]  
+        #total_earned_partner1 = (db.session.query(func.sum(Account.credit))\
+         #                   .filter_by(user_id=partner1.id).first())[0]  
                                                   
         if not  total_spent_partner1: total_spent_partner1 = 0.0
-        if not  total_earned_partner1: total_earned_partner1 = 0.0
+        #if not  total_earned_partner1: total_earned_partner1 = 0.0
         balances['ts_p1'] =  total_spent_partner1
-        balances['te_p1'] = total_earned_partner1
-        balances['t_p1'] = balances['te_p1'] - balances['ts_p1']
+        #balances['te_p1'] = total_earned_partner1
+        #balances['t_p1'] = balances['te_p1'] - balances['ts_p1']
         
      # Get the info for Partner 2
     partner2 = User.query.filter_by(email=user.partner2_email).first()
     if partner2:
           total_spent_partner2 = (db.session.query(func.sum(Account.spent))\
                             .filter_by(user_id=partner2.id).first())[0]
-          total_earned_partner2 = (db.session.query(func.sum(Account.credit))\
-                            .filter_by(user_id=partner2.id).first())[0]  
+          #total_earned_partner2 = (db.session.query(func.sum(Account.credit))\
+           #                 .filter_by(user_id=partner2.id).first())[0]  
                                                   
           if not  total_spent_partner2: total_spent_partner2 = 0.0
-          if not  total_earned_partner2: total_earned_partner2 = 0.0
+          #if not  total_earned_partner2: total_earned_partner2 = 0.0
           balances['ts_p2'] =  total_spent_partner2
-          balances['te_p2'] = total_earned_partner2
-          balances['t_p2'] = balances['te_p2'] - balances['ts_p2']
+          #balances['te_p2'] = total_earned_partner2
+          #balances['t_p2'] = balances['te_p2'] - balances['ts_p2']
           
     if partner1 and not partner2:
          balances['ts'] = balances['ts_user'] + balances['ts_p1']
-         balances['te'] = balances['te_user'] + balances['te_p1']
+         #balances['te'] = balances['te_user'] + balances['te_p1']
          if balances['ts_user'] < balances['ts_p1']:
              balances['ower'] = user.name
              balances['receiver'] = partner1.name
          else:
              balances['ower'] = partner1.name
              balances['receiver'] = user.name
-         balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p1'] + balances['te'])    
-         balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])      
+         balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p1'])    
+         #balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])      
          
     elif partner1 and partner2:
          balances['ts'] = balances['ts_user'] + balances['ts_p1'] + balances['ts_p2']
-         balances['te'] = balances['te_user'] + balances['te_p1'] + balances['te_p2']
+         #balances['te'] = balances['te_user'] + balances['te_p1'] + balances['te_p2']
          
-         mean = 0.3333333*(balances['ts'] - balances['te'])
+         #mean = 0.3333333*(balances['ts'] - balances['te'])
+         mean = 0.3333333*(balances['ts'])
          diff_u = mean - balances['ts_user']
          diff_p1 = mean - balances['ts_p1']
          diff_p2 = mean - balances['ts_p2']    
@@ -97,26 +98,27 @@ def check_balances():
             balances['amount_owned'] = diff_u
             balances['ower2'] = partner1.name 
             balances['amount_owned2'] = diff_p1
-         balances['surplus'] = 0.333333 * (balances['te'] - balances['ts'])  
+         #balances['surplus'] = 0.333333 * (balances['te'] - balances['ts'])  
                
     elif not partner1 and partner2:
          balances['ts'] = balances['ts_user'] + balances['ts_p2']
-         balances['te'] = balances['te_user'] + balances['te_p2']
+         #balances['te'] = balances['te_user'] + balances['te_p2']
          if balances['ts_user'] < balances['ts_p2']:
              balances['ower'] = user.name
              balances['receiver'] = partner2.name
          else:
              balances['ower'] = partner2.name
              balances['receiver'] = user.name
-         balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p2'] + balances['te'])  
-         balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])  
+         balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p2'])  
+         #balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])  
     else:
          balances['ts'] = balances['ts_user'] 
-         balances['te'] = balances['te_user'] 
+         #balances['te'] = balances['te_user'] 
          balances['amount_owned'] = 0.0
-         balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])  
+         #balances['surplus'] = 0.5 * (balances['te'] - balances['ts'])  
          
-    balances['tot'] =  balances['te'] -  balances['ts']
+    #balances['tot'] =  balances['te'] -  balances['ts']
+    balances['tot'] =  balances['ts']
     return balances, partner1, partner2
     
 @mod.route('/me/')
@@ -216,6 +218,7 @@ def delete_entry(entry_id):
         db.session.commit()
     else: flash('Oops, you can only delete your own entries.', 'delete')
     return redirect(url_for('users.profile'))
+    
 @requires_login
 @mod.route('/settings/', methods=['GET', 'POST'])
 def settings():
@@ -225,7 +228,6 @@ def settings():
     else: 
         g.user=None
         user=None
-    
     form = SettingsForm(request.form)
     if form.validate_on_submit():
         # Change Name
@@ -245,10 +247,13 @@ def settings():
             return redirect(url_for('users.settings'))
             
         if form.partner1.data:
-            user_data.partner1_email = form.partner1.data
-            db.session.add(user_data)
-            db.session.commit()
-            flash("Your Partner 1 info has been succesfully updated.", "add-partner")
+            if form.partner1.data != user_data.partner1_email and form.partner1.data != user_data.partner2_email:
+                user_data.partner1_email = form.partner1.dats
+                db.session.add(user_data)
+                db.session.commit()
+                flash("Your Partner 1 info has been succesfully updated.", "add-partner")
+            else:
+                flash("Information is up-to-date", "add-partner")
             return redirect(url_for('users.settings'))
             
         if form.partner2.data:
@@ -271,5 +276,9 @@ def delete_user():
     session.pop('user_id', None)
     session.clear()
     return redirect(url_for('users.home'))
-    
+   
+@mod.route('/about/')
+def about():
+    user = User.query.filter_by(id=session['user_id']).first()
+    return render_template("about.html", user=user.name, guser=g.user) 
     

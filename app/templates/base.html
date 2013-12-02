@@ -36,7 +36,7 @@
 			 </div>
               {% endif %}
 			 <div class="btn-group">
-			 <li class="btn"><a href="#">About</a></li>
+			 <li class="btn"><a href="{{ url_for('users.about') }}">About</a></li>
 			 </div>
 			 {% if guser %}
 			 <div class="btn-group">
@@ -140,5 +140,6 @@
 			     .on('click', clickToggle);
 		 
 		    </script> 	
+				
     </body>
   </html>

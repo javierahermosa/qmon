@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block headtitle %} - Home{% endblock %}
+
+{% block content %}
+
+<style>
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+</style>
+<div class="row">
+
+	   <div class="col-md-6 col-md-offset-3">
+<img src="{{ url_for('static', filename='img/javi.png') }}" width=40% height=40% class="img-circle img-responsive col-centered" >
+
+<h3> Qomon is a Qbite application developed to help couples or small groups keep track of their common expenses. </h3>
+<h3> Add up to two partners to your account and track how much you owe each other at the end of the month. </h3>
+<h3> Qomon was developed by Javiera Guedes, feel free to send her your comments or questions at <a href="mailto:javierahermosa@yahoo.com">this email</a> address. </h3>
+</div>
+
+
+
+</div>
+
+
+{% endblock %}

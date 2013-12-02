@@ -24,7 +24,7 @@
 
     <div class="row">
       <div class="col-6 col-sm-5 col-lg-14">
-		  <h3 class="text-mutted text-left">  Add a qomon item! </h3>
+		  <h3 class="text-mutted text-left">  Add a new qomon expense! </h3>
 
 		  {% from "forms/macros.html" import render_field %}
 		  <form role="form" class="form form-medium" action="." method="post">
@@ -40,16 +40,18 @@
       <div class="form-group">
 		  {{ render_field(form.amount, class="form-control input-small text") }}
       </div>
-    
+	  {# 
 
 		  {{ render_field(form.earned, class="input checkbox") }}
+		  
+		   #}
 		  <button type="submit" class="btn btn-success">Add</button>
 		  </form>
     
-	
+		 
       </div><!--/span-->
          
-      <div class="col-5 col-sm-6 col-lg-5">
+   
 
 		<div class="col-lg-6 col-sm-11 content"  style="background-color:#F0F0F0 ">
 	    
@@ -70,14 +72,14 @@
 						<strong>{{p1.name}}</strong> spent : </h3>
 					</td>
 					<td>&nbsp;</td>
-					<td><h3 class="text-right">$ {{ '%.2f' % bal['t_p1'] | abs()}}</h3></td>
+					<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_p1'] | abs() }}</h3></td>
 				</tr>
 	            {% endif %}
 				{%  if p2 %}
 				<tr>
 					<td><h3 class="text-left"><strong>{{p2.name}}</strong>  total: </h3></td>
 					<td>&nbsp;</td>
-					<td><h3 class="text-right">$ {{'%.2f' % bal['t_p2'] | abs() }}</h3></td>
+					<td><h3 class="text-right">$ {{'%.2f' % bal['ts_p2'] | abs() }}</h3></td>
 				</tr>
 				{% endif %}
 			    {% if not p1 or not p2 %}
@@ -88,15 +90,18 @@
 				</td>
 				</tr>
 				{% endif %}
-				
-				 {% if bal['te'] > 0 %}
-				 <tr>
- 					<td><h3 class="text-left">Qomon <strong>Earned</strong>: </h3></td>
- 					<td>&nbsp;</td>
- 					<td><h3 class="text-right">$ {{'%.2f' % bal['te'] | abs() }}</h3></td>
-				 </tr>
-                 {% endif %}
-				 
+			
+			{#	
+			 {% if bal['te'] > 0 %}
+	
+			 <tr>
+					<td><h3 class="text-left">Qomonly <strong>Earned</strong>: </h3></td>
+					<td>&nbsp;</td>
+					<td><h3 class="text-right">$ {{'%.2f' % bal['te'] | abs() }}</h3></td>
+			 </tr>
+                {% endif %}
+				#}
+				{#
 			    {% if bal['tot'] > 0 %}
 				
 				<tr>
@@ -106,6 +111,7 @@
 				</tr>
 	
 				{% else %}
+				#}
 				{% if p1 %}
 				<tr>
 					<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver']}}:</em></h3></td>
@@ -120,14 +126,14 @@
 					<td class="text-warning"><h3 class="text-right"><em><strong>{{'%.2f' % bal['amount_owned2']}}</strong></em></h3></td>
 				</tr>
 				{% endif %}
-				{% endif %}
+				{# {% endif %} #}
 			</table>
 	        <p>&nbsp;</p>
 		</div>
  
 	</div>
        
-      </div><!--/span-->
+
       
 
 <hr>  <!--horizontal line-->
@@ -140,8 +146,8 @@
 </th>
  				<th>Date   <span class="caret"></th>
  				<th>Description   <span class="caret"></th>
- 				<th class="text-right">Spent <span class="caret"></th>
- 				<th class="text-right">Earned <span class="caret"> </th>
+ 				<th class="text-center">Spent <span class="caret"></th>
+ 				{# <th class="text-right">Earned <span class="caret"> </th> #}
 				<th class="text-right">Action</th>
 			</tr>
 		</thead>
@@ -154,15 +160,17 @@
 	             <td>{{entry.date}}</td>
 				<td>{{entry.description}}</td>
 				{% if entry.spent > 0 %}
-				<td class="text-right">$ {{ '%.2f' % entry.spent}}</td>
+				<td class="text-center">$ {{ '%.2f' % entry.spent}}</td>
 				{% else %}
 				<td class="muted"> </td>
 				{% endif %}
+				{#
 				{% if entry.credit > 0 %}
 				<td class="text-right">$ {{'%.2f' % entry.credit}}</td>
 				{% else %}
 				<td> </td>
 				{% endif %}
+				#}
 				<td class="text-right">
 					<span class="glyphicon glyphicon-pencil"></span>
 				
@@ -171,33 +179,11 @@
 				</td>
 		     </tr>
 		  {% endfor %}
-		  {% if entries %}
-		  <tr>
-		    <td class="success"></td>	
-			<td class="success text-success"><strong> TOTAL</strong></td>	
-			<td class="success"></td>	
-			<td class="success"></td>	
-			<td class="success text-success text-right"> $ {{'%.2f' % bal['ts'] | abs()}}</td>	
-			{% if bal['te'] == 0.0 %}
-			<td class="success"> </td>
-			{% else %}
-			<td class="success text-success text-right"> $ {{'%.2f' % bal['te'] | abs()}}</td>	
-		     {% endif %}
-			 	
-			<td class="success text-success text-right">
-				
-				<strong> $ {{'%.2f' % bal['tot'] | abs()}} </strong>
-				{% if bal['tot'] < 0 %}	
-			    <span class="glyphicon glyphicon-circle-arrow-down">
-				{% else %}
-				 <span class="glyphicon glyphicon-circle-arrow-up">
-					 {% endif %}
-			</td>
-		
-			
-		   </tr>
-		   {% endif %}
+
 	      </tbody>
 	</table>
+
 	
 {% endblock %}
+
+
