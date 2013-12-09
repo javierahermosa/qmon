@@ -1,77 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-    {% block head %}
-    	<title>Qbite Begins{% block headtitle %}{% endblock %}</title>
-    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    	<meta name="description" content="">
-    	<meta name="keywords" content="">
-    	<meta name="author" content="Javiera Guedes">
-    	<meta charset="utf-8">
-		
-  	  
-		<link type="text/css" rel="stylesheet" 
-		      href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
-		 <link type="text/css" rel="stylesheet" 
-		  		      href="{{ url_for('static', filename='css/my.css') }}" />
-	  	<link type="text/css" rel="stylesheet" 
-	  		  		      href="{{ url_for('static', filename='css/datepicker.css') }}" />
-	    <link rel="shortcut icon" 
-	          href="{{ url_for('static', filename='ico/qbite.ico') }}">		
-		<link rel='stylesheet' type='text/css' 
-		      href='http://fonts.googleapis.com/css?family=Share+Tech+Mono' >
-  
+
+<head>
+{% block head %}
+	<title>Qbite Begins{% block headtitle %}{% endblock %}</title>
+ 	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 	<meta name="description" content="">
+ 	<meta name="keywords" content="">
+ 	<meta name="author" content="Javiera Guedes">
+ 	<meta charset="utf-8">
 	
-	   	
-    {% endblock %}
-
-	</head>
-    <body>
-	<div class="container-narrow">	
-	  <div class="masthead">
-      	 <ul class="nav nav-pills pull-right">
-			 {% if not guser %}
-			 <div class="btn-group">
-			 <li  class=" btn btn-active"><a href="{{ url_for('users.home') }}">Home</a></li>
-			 </div>
-              {% endif %}
-			 <div class="btn-group">
-			 <li class="btn"><a href="{{ url_for('users.about') }}">About</a></li>
-			 </div>
-			 {% if guser %}
-			 <div class="btn-group">
-			   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-			     {{user}} <span class="caret"></span>
-			   </button>
-			   <ul class="dropdown-menu" role="menu">
-			     <li><a href="{{ url_for('users.profile') }}">My Qomon</a></li>
-			 	<li><a href="{{ url_for('users.settings') }}">Settings</a></li>
-			     <li class="divider"></li>
-			     <li><a href="{{ url_for('users.logout') }}">Logout</a></li>
-			   </ul>
-			 </div>
-			 {% endif %}
-			 {% if not guser %}
-			  <div class="btn-group">
-			 <li><a href="{{ url_for('users.login') }}">Log In</a></li>
-		 </div>
-			 {% endif %}
+	<link type="text/css" rel="stylesheet" 
+		  href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+	<link type="text/css" rel="stylesheet" 
+		  href="{{ url_for('static', filename='css/my.css') }}" />
+	<link type="text/css" rel="stylesheet" 
+	  	  href="{{ url_for('static', filename='css/datepicker.css') }}" />
+	<link rel="shortcut icon" 
+	      href="{{ url_for('static', filename='ico/qbite.ico') }}">		
+	<link rel='stylesheet' type='text/css' 
+		  href='http://fonts.googleapis.com/css?family=Share+Tech+Mono' > 	
+ {% endblock %}
+</head>
+	
+ <body>
+	 <div class="container-narrow">	
+		<div class="masthead">
+   	 	   <ul class="nav nav-pills pull-right">
+				<div class="btn-group">
+			 	   <li  class=" btn btn-active"><a href="{{ url_for('users.home') }}">Home</a></li>
+			 	</div>
+       			
+				<div class="btn-group">
+			 	   <li class="btn"><a href="{{ url_for('users.about') }}">About</a></li>
+			 	</div>
+				
+			 	{% if guser %}
+				<div class="btn-group">
+			    	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			     	  	{{guser.name}} <span class="caret"></span>
+			   	 	</button>
+			   		<ul class="dropdown-menu" role="menu">
+			     		<li><a href="{{ url_for('users.profile') }}">My Qomon</a></li>
+			 	 		<li><a href="{{ url_for('users.settings') }}">Settings</a></li>
+			     		<li class="divider"></li>
+			     		<li><a href="{{ url_for('users.logout') }}">Logout</a></li>
+			   		</ul>
+			 	</div>
+			    {% endif %}
 			    
-      	  </ul>
-      	  <h2 class="muted">{% block title %}Qbite{% endblock %}</h2>
-      </div> <!-- class masthead -->
+				{% if not guser %}
+			    <div class="btn-group">
+			 	   <li><a href="{{ url_for('users.login') }}">Log In</a></li>
+		 	  	</div>
+			 	{% endif %}
+		   </ul>
+   	  	 
+		  <h2 class="muted">{% block title %} Qomon{% endblock %}</h2>
+   	</div> <!-- masthead -->
+	  
+	<hr> <!--horizontal line-->
 
-	  
-	  <hr> <!--horizontal line-->
-   
-   {% block content %}
-   
-   {% endblock %}
-   	  
-	  
-   {% block footer %}
-    <footer class="footer">
-	   <p>Qomon is a Qbite production powered by 
+	{% block content %}
+	{% endblock %}
+	  	  
+	{% block footer %}
+ 	<footer class="footer">
+		<p>Qomon is a Qbite production powered by 
 			<a href="http://flask.pocoo.org/docs/">Flask</a>,
 			<a href="http://getbootstrap.com/">Bootstrap</a>,
 			<a href="http://glyphicons.com/"> Glyphicons</a>, and 
@@ -83,63 +79,63 @@
 	
 	</div> <!-- container narrow -->  
 	
-    <!-- javascript -->
-    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script>
-<script src="{{ url_for('static', filename='js/jquery.tablesorter.min.js') }}"></script>
+ <!-- javascript -->
+	<script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap-datepicker.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/jquery.tablesorter.min.js') }}"></script>
     
-    <script>
-    	  $(function(){
+ 	<script>
+    	$(function(){
     	  	$('.datepicker').datepicker({
     	  		format: 'dd M yyyy',
     	  		autoclose: true
     	  		});
-    	  	});
+    	  });
     </script>
 	
 	<script>  
-	        $(document).ready(function () {  
-	            $('.dropdown-toggle').dropdown();  
-	        });  
-	   </script> 
+	    $(document).ready(function () {  
+	        $('.dropdown-toggle').dropdown();  
+	     });  
+	</script> 
 	   
-	   <script>  
+	<script>  
 	   $(function() {
 	     $('.table').tablesorter();
-
 	   });
-	      </script> 	
-		     <script>  
-			 var $btn2 = $('#popover');
-			 $btn2.data('state', 'hover');
+	</script> 	
+	
+	 <script>  
+	 var $btn2 = $('#popover');
+	 $btn2.data('state', 'hover');
 
-			 var enterShow = function () {
-			     if ($btn2.data('state') === 'hover') {
-			         $btn2.popover('show');
-			     }
-			 };
-			 var exitHide = function () {
-			     if ($btn2.data('state') === 'hover') {
-			         $btn2.popover('hide');
-			     }
-			 };
+	 var enterShow = function () {
+	     if ($btn2.data('state') === 'hover') {
+	         $btn2.popover('show');
+	     }
+	 };
+	 var exitHide = function () {
+	     if ($btn2.data('state') === 'hover') {
+	         $btn2.popover('hide');
+	     }
+	 };
 
-			 var clickToggle = function () {
-			     if ($btn2.data('state') === 'hover') {
-			         $btn2.data('state', 'pinned');
-			     } else {
-			         $btn2.data('state', 'hover')
-			         $btn.popover('hover');
-			     }
-			 };
+	 var clickToggle = function () {
+	     if ($btn2.data('state') === 'hover') {
+	         $btn2.data('state', 'pinned');
+	     } else {
+	         $btn2.data('state', 'hover')
+	         $btn.popover('hover');
+	     }
+	 };
 
-			 $btn2.popover({trigger: 'manual'})
-			     .on('mouseenter', enterShow)
-			     .on('mouseleave', exitHide)
-			     .on('click', clickToggle);
-		 
-		    </script> 	
+	 $btn2.popover({trigger: 'manual'})
+	     .on('mouseenter', enterShow)
+	     .on('mouseleave', exitHide)
+	     .on('click', clickToggle);
+	
+	</script> 	
 				
-    </body>
-  </html>
+</body>
+</html>

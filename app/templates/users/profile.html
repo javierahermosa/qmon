@@ -4,185 +4,304 @@
 
 {% block content %}
 
- 	
-{% with errors = get_flashed_messages(category_filter=["partner1"]) %}
-{% if errors %}
-    {%- for msg in errors %}
-    <p>{{ msg }}</p>
-    {% endfor -%}
-{% endif %}
-{% endwith %}
-
 {% with errors = get_flashed_messages(category_filter=["delete"]) %}
-{% if errors %}
-    {%- for msg in errors %}
-    <p class="text-danger">{{ msg }}</li>
-    {% endfor -%}
-{% endif %}
+	{% if errors %}
+    	{%- for msg in errors %}
+    		<p class="text-danger">{{ msg }}</li>
+    	{% endfor -%}
+	{% endif %}
 {% endwith %}
 
-
-    <div class="row">
-      <div class="col-6 col-sm-5 col-lg-14">
-		  <h3 class="text-mutted text-left">  Add a new qomon expense! </h3>
-
-		  {% from "forms/macros.html" import render_field %}
-		  <form role="form" class="form form-medium" action="." method="post">
-		  {{ form.csrf_token }}
-		  	  <div class="form-group">
+<div class="row">
+	<div class="col-sm-3 col-md-4 col-lg-4">
 		
-		  {{ render_field(form.date, class="form-control input-small text datepicker") }}
-      </div>
-      <div class="form-group">
-	
-		  {{ render_field(form.description, class="form-control input-large text") }}
-      </div>
-      <div class="form-group">
-		  {{ render_field(form.amount, class="form-control input-small text") }}
-      </div>
-	  {# 
-
-		  {{ render_field(form.earned, class="input checkbox") }}
+		<h3 class="text-mutted text-left">  Add a new qomon expense! </h3>
 		  
-		   #}
-		  <button type="submit" class="btn btn-success">Add</button>
-		  </form>
-    
-		 
-      </div><!--/span-->
-         
-   
-
-		<div class="col-lg-6 col-sm-11 content"  style="background-color:#F0F0F0 ">
-	    
-			<table class="table-responsive">
-			
-				<tr>
-					<td><h3 class="text-left">
-						<strong>{{user}}</strong> spent:&nbsp;&nbsp;</h3>
-					</td>
-					<td></td>
-					<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_user'] | abs()}}</h3></td>
-					
-				</tr>
-				{% if p1 %}
-		
-				<tr>
-					<td><h3 class="text-left">
-						<strong>{{p1.name}}</strong> spent : </h3>
-					</td>
-					<td>&nbsp;</td>
-					<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_p1'] | abs() }}</h3></td>
-				</tr>
-	            {% endif %}
-				{%  if p2 %}
-				<tr>
-					<td><h3 class="text-left"><strong>{{p2.name}}</strong>  total: </h3></td>
-					<td>&nbsp;</td>
-					<td><h3 class="text-right">$ {{'%.2f' % bal['ts_p2'] | abs() }}</h3></td>
-				</tr>
-				{% endif %}
-			    {% if not p1 or not p2 %}
-				<tr>
-					<td>
-				    <a class="text-muted" href="{{ url_for('users.settings') }}">
-					<span class="glyphicon glyphicon-plus-sign text-muted"></span> Add Partner</a> 
-				</td>
-				</tr>
-				{% endif %}
-			
-			{#	
-			 {% if bal['te'] > 0 %}
-	
-			 <tr>
-					<td><h3 class="text-left">Qomonly <strong>Earned</strong>: </h3></td>
-					<td>&nbsp;</td>
-					<td><h3 class="text-right">$ {{'%.2f' % bal['te'] | abs() }}</h3></td>
-			 </tr>
-                {% endif %}
-				#}
-				{#
-			    {% if bal['tot'] > 0 %}
-				
-				<tr>
-					<td><h3 class="text-left"><em>Surplus! Each receives:</em></h3></td>
-					<td></td>
-					<td class="text-success"><h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['surplus']}}</strong></em></h3></td>
-				</tr>
-	
-				{% else %}
-				#}
-				{% if p1 %}
-				<tr>
-					<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver']}}:</em></h3></td>
-					<td></td>
-					<td class="text-warning"><h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owned'] | abs()}}</strong></em></h3></td>
-				</tr>
-				{% endif %}
-				{% if p2 %}
-				<tr>
-					<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver2']}}:</em></h3></td>
-					<td></td>
-					<td class="text-warning"><h3 class="text-right"><em><strong>{{'%.2f' % bal['amount_owned2']}}</strong></em></h3></td>
-				</tr>
-				{% endif %}
-				{# {% endif %} #}
-			</table>
-	        <p>&nbsp;</p>
-		</div>
- 
-	</div>
-       
-
+		{% from "forms/macros.html" import render_field %}
+		<form role="form" class="form form-medium" action="{{ url_for('users.profile') }}" method="post">
+		{{ form.csrf_token }}
+			<div class="form-group">
+				{{ render_field(form.date, class="form-control input-small text datepicker") }}
+      	  	</div>
       
-
-<hr>  <!--horizontal line-->
-<div class="table-responsive">
-	<table class="table table-striped tablesorter" id="account-table">
-		<thead>
+	  	  	<div class="form-group">
+	    		{{ render_field(form.description, class="form-control input-large text") }}
+      	  	</div>
+      	    <div class="form-group">
+		        {{ render_field(form.amount, class="form-control input-small text") }}
+            </div>
+			
+	  		<button type="submit" class="btn btn-success">Add</button>
+		 </form>
+    
+	 </div><!-- column-->
+	 
+     <div class="col-sm-5 col-md-6 col-lg-6 col-sm-offset-3 col-md-offset-1 col-lg-offset-1 "  style="background-color:#F0F0F0 ">
+	    <table class="table-responsive">
 			<tr>
- 				<th>#</th>
- 				<th>Who   <span class="caret"></span>
-</th>
- 				<th>Date   <span class="caret"></th>
- 				<th>Description   <span class="caret"></th>
- 				<th class="text-center">Spent <span class="caret"></th>
- 				{# <th class="text-right">Earned <span class="caret"> </th> #}
-				<th class="text-right">Action</th>
+				<td><h3 class="text-left"><strong>{{user.name}}</strong> spent:&nbsp;&nbsp;</h3></td>
+				<td></td>
+				<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_user'] }}</h3></td>
 			</tr>
-		</thead>
-		
-		<tbody>
-		{% for entry in entries %}   
-		   <tr class=entries>	
-			 <td> {{loop.index}} </td>
-			    <td>{{entry.user_name}}</td>			
-	             <td>{{entry.date}}</td>
-				<td>{{entry.description}}</td>
-				{% if entry.spent > 0 %}
-				<td class="text-center">$ {{ '%.2f' % entry.spent}}</td>
-				{% else %}
-				<td class="muted"> </td>
-				{% endif %}
-				{#
-				{% if entry.credit > 0 %}
-				<td class="text-right">$ {{'%.2f' % entry.credit}}</td>
-				{% else %}
-				<td> </td>
-				{% endif %}
-				#}
-				<td class="text-right">
-					<span class="glyphicon glyphicon-pencil"></span>
-				
-				    <a href="{{ url_for('users.delete_entry',entry_id=entry.trans_id) }}">
-					<span class="glyphicon glyphicon-trash"></span></a> 
+			
+			{% if p1 %}
+			<tr>
+				<td><h3 class="text-left"> <strong>{{p1.name}}</strong> spent: </h3></td>
+				<td>&nbsp;</td>
+				<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_p1'] }}</h3></td>
+			</tr>
+	        {% endif %}
+			
+			{%  if p2 %}
+			<tr>
+				<td><h3 class="text-left"><strong>{{p2.name}}</strong>  spent: </h3></td>
+				<td>&nbsp;</td>
+				<td><h3 class="text-right">$ {{'%.2f' % bal['ts_p2'] }}</h3></td>
+			</tr>
+			{% endif %}
+			
+			{% if not p1 or not p2 %}
+			<tr>
+				<td>
+				    <a class="text-muted" href="{{ url_for('users.settings') }}">
+						<span class="glyphicon glyphicon-plus-sign text-muted"></span> Add Partner
+					</a> 
 				</td>
-		     </tr>
-		  {% endfor %}
+			</tr>
+			{% endif %}
+			
+			{% if p1 and not p2 %}
+			<tr>
+				<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver']}}:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owned'] | abs() }}</strong></em></h3>
+				</td>
+				</tr>
+			{% endif %}
+			
+			{% if p2 and not p1%}
+			<tr>
+				<td><h3 class="text-left"><em>{{bal['ower2']}} owes {{bal['receiver']}}:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['amount_owned2'] | abs() }}</strong></em></h3>
+				</td>
+			</tr>
+			{% endif %}
+			
+			{% if p1 and p2 %}
+			{% if bal['n_owers']== 1 %}
+			<tr>
+				<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver1']}}:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owed1'] |abs() }}</strong></em></h3>
+				</td>
+				</tr>
+				
+			<tr>
+				<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver2']}}:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['amount_owed2'] | abs() }}</strong></em></h3>
+				</td>
+			</tr>	
+			{% elif bal['n_owers']==2 %}
+			<tr>
+				<td><h3 class="text-left"><em>{{bal['ower1']}} owes {{bal['receiver']}}:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owed1'] | abs() }}</strong></em></h3>
+				</td>
+				</tr>
+				
+			<tr>
+				<td><h3 class="text-left"><em>{{bal['ower2']}} owes {{bal['receiver']}}:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['amount_owed2'] | abs() }}</strong></em></h3>
+				</td>
+			</tr>	
+			{% endif %}
+			{% endif %}
+			
+			{# 
+			<tr>
+				<td><h3 class="text-left"><em>mean:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['mean']  }}</strong></em></h3>
+				</td>
+			</tr>
+			<tr>
+				<td><h3 class="text-left"><em>diff:</em></h3></td>
+				<td></td>
+				<td class="text-warning">
+					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['diff_u']  }} {{'%.2f' % bal['diff_p1']  }} {{'%.2f' % bal['diff_p2']  }}</strong></em></h3>
+				</td>
+			</tr>
+	
+			#}
+			
+				
+		</table>
+	    <p>&nbsp;</p>
+		
+	</div> <!-- column-->
+</div> <!--row-->
+      
+<hr>  <!--horizontal line-->
 
-	      </tbody>
-	</table>
+<div class="row">
+	<div class="col-sm-6 col-md-4 col-lg-5">
+		<div class="btn-group pull-left">
+			<button type="button" class="btn btn-default"> {{user.current_list}} </button>
+  		    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    			<span class="caret"></span>
+    			<span class="sr-only">Toggle Dropdown</span>
+  	  		</button>
+  		  	<ul class="dropdown-menu" role="menu">
+				{% for list in lists %}
+					{% if list != user.current_list %}
+					<li>
+						<a href="{{ url_for('users.current_list',list_name=list) }}"
+						   data-target="#Save">{{list}}</a>
+					</li>
+					{% endif %}
+				    {% if lists | length == 1%}
+					<li>
+						<p class="text-muted"> &nbsp; <em>No more lists</em></p>
+					</li>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
 
+	<div class="col-sm-6 col-md-6 col-lg-5 col-md-offset-2">
+		<div class="btn-group pull-right">
+		
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#save"> 
+				<span class="glyphicon glyphicon-floppy-disk"></span>
+			</button>
+			
+  		  	<button class="btn btn-default" data-toggle="modal" data-target="#delete_new">
+				<span class="glyphicon glyphicon-trash"></span>
+			</button>
+		</div>
+	</div> <!-- column-->
+</div>  <!--row-->
+
+
+<!-- Modal Delete List -->
+<div class="modal fade" id="delete_new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+         <h3 class="modal-title" id="myModalLabel">Warning! </h3>
+       </div>
+       <div class="modal-body">
+         <h4>Are you sure that you want to <strong>clear all entries </strong> in this list?</h4>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		 <a href="{{ url_for('users.delete_new') }}">
+		  <button class="btn btn-danger">Delete Entries</button></a> 
+       </div>
+     </div><!-- modal content -->
+   </div><!-- modal-dialog -->
+</div><!-- modal -->
+ 
+
+<!-- Modal Save List -->
+<div class="modal fade" id="save" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+     <div class="modal-content">
+       <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+         <h3 class="modal-title" id="myModalLabel">Save List And Start New</h3>
+       </div>
+	   
+	   <form role="form_list" class="form form-medium" action="." method="post">
+	   {{ form_save.csrf_token }}
+	   	<div class="modal-body">	
+		 	<h4>Save list as: </h4>
+		 	{{ render_field(form_save.list_name, class="input-large") }}
+       	</div>
+
+      	<div class="modal-footer">
+         	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		 	<a href="#">
+		  	  <button class="btn btn-success">Save List</button></a> 
+       	</div>
+      </form>
+	  
+     </div><!-- modal content -->
+   </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<p>&nbsp;<p>
+
+<table class="table table-responsive table-striped tablesorter" id="account-table">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Who <span class="caret"></span></th>
+			<th class="text-center">Date  <span class="caret"></th>
+			<th class="text-center">Description <span class="caret"></th>
+			<th class="text-right">Spent <span class="caret"></th>
+			<th class="text-right">Action</th>
+		</tr>
+	</thead>
+	
+	<tbody>
+		{% for entry in entries %}   
+   		<tr>	
+	 	   <td> {{loop.index}} </td>
+	 	   <td> {{entry.user_name}} </td>
+	 	   
+	 	   {% if entry.edit %}
+	 	   		<form role="form" class="form form-medium" 
+				      action="{{ url_for('users.profile') }}" method="post">
+	 				{{ form.csrf_token }}
+     			   <td class="text-center"> 
+	 					{{ render_field(form.date, class="form-control input text-center datepicker", value=entry.date) }}
+	 				</td>
+	 				<td class="text-center"> 
+	 					{{ render_field(form.description, class="form-control input text-center", value=entry.description) }}
+	 				</td>
+	 				<td class="text-right"> 
+	 					{{ render_field(form.amount, class="form-control input text-right", value= '%.2f' % entry.spent) }} 
+	 				</td>	
+	 				<td class="text-right"><button type="submit" class="btn btn-info">Edit</button></td>
+ 	 		  	</form>
+	 		
+	 	   {% else %}
+         	   	<td class="text-center">{{entry.date}}</td>
+	 			<td class="text-center">{{entry.description}}</td>
+	 		
+	 	   {% if entry.spent > 0 %}
+	 			<td class="text-right">$ {{ '%.2f' % entry.spent}}</td>
+	 	   {% else %}
+	 			<td class="muted"> </td>
+	 	   {% endif %}
+	 	   
+	 		<td class="text-right">
+	 			<a href="{{ url_for('users.edit_entry',entry_id=entry.trans_id) }}">
+	 				<span class="glyphicon glyphicon-pencil"></span>
+	 			</a> 
+	 			<a href="{{ url_for('users.delete_entry',entry_id=entry.trans_id) }}">
+	 				<span class="glyphicon glyphicon-remove"></span>
+	 			</a> 
+	 		</td>
+	 	    {% endif %}	
+		 </tr>    
+	    {% endfor %}
+    </tbody>
+	
+</table>
 	
 {% endblock %}
 

@@ -23,16 +23,19 @@ class DataForm(Form):
     date = TextField('Date')
     description = TextField('Description')
     amount = FloatField('Amount', [NumberRange(min=0)])
-    earned = BooleanField('This was earned!')
+    edit = BooleanField('Edit')
 
 class SettingsForm(Form):
     change_name = TextField('Name',[Length(min=4, max=15)])
     change_pwd =  PasswordField('Password')
     change_pwd_confirm = PasswordField('Password', [
             EqualTo('change_pwd', message='Passwords must match')
-            ])          
+            ])
+            
+class PartnerForm(Form):          
     partner1 = TextField('Partner 1')
     partner2 = TextField('Partner 2')
     
-    
+class ListForm(Form):
+    list_name = TextField('List Name',[Length(min=1, max=15)])
     

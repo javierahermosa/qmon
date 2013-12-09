@@ -1,10 +1,12 @@
 import os
+from itsdangerous import URLSafeTimedSerializer
+
 _basedir = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = False
 
 ADMINS = frozenset(['javiereahermosa@yahoo.com'])
-SECRET_KEY = 'NOTRATISDEMETERTELOCO'
+SECRET_KEY = '@#$^NOTRATIS$&^DEMETERTELOCOYU'
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(_basedir, 'app.db')
 DATABASE_CONNECT_OPTIONS = {}
@@ -12,7 +14,11 @@ DATABASE_CONNECT_OPTIONS = {}
 THREADS_PER_PAGE = 8
 
 CSRF_ENABLED = True
-CSRF_SESSION_KEY = "notemetai"
+CSRF_SESSION_KEY = "HSJDAHSGDHAGY#T*Q*($()())"
+
+login_serializer = URLSafeTimedSerializer(SECRET_KEY)
+
+REMEMBER_COOKIE_NAME = 'qomon_remember'
 
 #RECAPTCHA_USE_SSL = False
 #RECAPTCHA_PUBLIC_KEY = '6LeYIbsSAAAAACRPIllxA7wvXjIE411PfdB2gt2J'

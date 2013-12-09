@@ -1,47 +1,44 @@
 {% extends "base.html" %}
 {% block headtitle %} - Home{% endblock %}
 
-
- 
 {% block content %}
+
 <div class="jumbotron">
-	<h1>Qomon</h1>
-	<p class="lead">A free app to help you keep track of common expenses </p>
-	<a class="btn btn-large btn-success" href="{{ url_for('users.register') }}">Sign up today</a>
-</div> <!-- class jumbotron -->
+	<div class="container">
+		<h1>Qomon</h1>
+		{% if not guser %}	
+		<p class="lead">A free app to help you keep track of common expenses </p>
+		<a class="btn btn-large btn-success" href="{{ url_for('users.register') }}">Sign up today!</a>
+		{% else %}
+		<p class="lead">A free app to help you keep track of common expenses </p>
+		<a class="btn btn-large btn-success" href="{{ url_for('users.profile') }}">Go to your account!</a>
+		{% endif %}
+	</div>
+</div> <!-- jumbotron -->
 	  
-	  
-<hr>  <!--horizontal line-->
-<div class="table-responsive">
-<table class="table table-striped" id="account-table">
-	<thead>
-		<tr>
-			<th>#</th>
-			<th>Who</th>
-			<th>Date</th>
-			<th>Description</th>
-			<th>Spent</th>
-			<th>Credit</th>
-			<th>Balance</th>
-			<th>Action</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-        	<td>0</td>
-        	<td class="mutted">Thomas</td>
-        	<td>05 May 2013</td>
-        	<td class="mutted">Groceries</td>
-        	<td class="text-success">$150.00</td>
-        	<td class="text-error"></td>
-        	<td class="text-success">$150.00</td>
-			<td>
-				<i class="icon-small icon-pencil"></i>
-			    <i class="icon-small icon-trash"></i> 
-			</td>
-		</tr>
-		
-	  
-</table>
+<hr class="featurette-divider">
+
+<div class="row featurette">
+  <div class="col-md-7 col-sm-8 col-xs-8">
+    <h2 class="featurette-heading">Tracking common expenses <span class="text-muted"> is now simple</span></h2>
+    <p class="lead">Qomon is the perfect tool for couples, roommates, colleagues, or small groups that need to keep track of common expenses. It helps you keep a tab of what each partner spent and tells you how much you owe each other. </p>
+  </div>
+  <div class="col-md-5 col-sm-4 col-xs-4">
+    <img class="featurette-image img-responsive img-circle" src="{{ url_for('static', filename='img/front.jpg') }}" alt="Generic placeholder image">
+  </div>
 </div>
+
+
+<hr>  <!--horizontal line-->
+
+<h2 class="text-success"> It's simple! Here is a snippet: </h2>
+<h5> &nbsp; </h5>
+<div class="container">
+	<img src="{{ url_for('static', filename='img/demo.png') }}" 
+	     width=100% height=100% class="img-rounded img-responsive col-centered  ImageBorder" >
+</div> <!-- class jumbotron -->
+
+<hr>  <!--horizontal line-->
+
+
 {% endblock %}
