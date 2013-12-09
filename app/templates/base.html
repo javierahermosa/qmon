@@ -28,10 +28,7 @@
 	 <div class="container-narrow">	
 		<div class="masthead">
    	 	   <ul class="nav nav-pills pull-right">
-				<div class="btn-group">
-			 	   <li  class=" btn btn-active"><a href="{{ url_for('users.home') }}">Home</a></li>
-			 	</div>
-       			
+				
 				<div class="btn-group">
 			 	   <li class="btn"><a href="{{ url_for('users.about') }}">About</a></li>
 			 	</div>
@@ -57,7 +54,9 @@
 			 	{% endif %}
 		   </ul>
    	  	 
-		  <h2 class="muted">{% block title %} Qomon{% endblock %}</h2>
+		  <a href="{{ url_for('users.home') }}">
+			  <h2 class="muted">Qomon</h2>
+		  </a>
    	</div> <!-- masthead -->
 	  
 	<hr> <!--horizontal line-->
@@ -102,7 +101,9 @@
 	   
 	<script>  
 	   $(function() {
-	     $('.table').tablesorter();
+	     $('.table').tablesorter({
+	     	cssInfoBlock : "avoid-sort"
+	     });
 	   });
 	</script> 	
 	
