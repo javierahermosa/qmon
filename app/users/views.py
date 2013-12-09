@@ -183,6 +183,10 @@ def profile():
         db.session.commit()
         if p1: p1.current_list = "new"
         if p2: p2.current_list = "new"
+        db.session.add(user)
+        db.session.commit()
+        db.session.add(user)
+        db.session.commit()
         return redirect(url_for('users.profile'))
              
     entries = Account.query.filter_by(user_id=session['user_id'], list_name=user.current_list).all()

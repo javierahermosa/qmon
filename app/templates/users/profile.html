@@ -27,11 +27,17 @@
 	  	  	<div class="form-group">
 	    		{{ render_field(form.description, class="form-control input-large text") }}
       	  	</div>
-      	    <div class="form-group">
+      	    <div class="input-group">
+				<span class="input-group-addon">$</span>
 		        {{ render_field(form.amount, class="form-control input-small text") }}
             </div>
+			<p> &nbsp;</p>
 			
-	  		<button type="submit" class="btn btn-success">Add</button>
+			{% if user.current_list != "new" %}
+	  		<button type="submit" class="btn btn-success disabled">Add</button>
+			{% else %}
+			<button type="submit" class="btn btn-success">Add</button>
+			{% endif %}
 		 </form>
     
 	 </div><!-- column-->
@@ -154,36 +160,53 @@
 <hr>  <!--horizontal line-->
 
 <div class="row">
-	<div class="col-sm-6 col-md-4 col-lg-5">
+	<div class="col-sm-6 col-md-4 col-lg-">
 		<div class="btn-group pull-left">
-			<button type="button" class="btn btn-default"> {{user.current_list}} </button>
+			<button type="button" class="btn btn-default"> My lists </button>
+			
+			{% if user.current_list == "new" %}
+			<a class="btn btn-primary" href="{{ url_for('users.current_list',list_name='new') }}">Current</a>
+			{% else %}
+			<a class="btn btn-default" href="{{ url_for('users.current_list',list_name='new') }}">Current</a>
+			{% endif %}
+			<div class="btn-group">
+				
+			{% if user.current_list != "new" %}
+			<button type="button" class="btn btn-primary"> {{user.current_list}}</button>
+			{% else %}
+			<button type="button" class="btn btn-default"> Saved Lists</button>
+			{% endif %}
+				
   		    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
     			<span class="caret"></span>
     			<span class="sr-only">Toggle Dropdown</span>
   	  		</button>
   		  	<ul class="dropdown-menu" role="menu">
 				{% for list in lists %}
-					{% if list != user.current_list %}
+				{% if list != "new" %}
 					<li>
 						<a href="{{ url_for('users.current_list',list_name=list) }}"
 						   data-target="#Save">{{list}}</a>
 					</li>
-					{% endif %}
-				    {% if lists | length == 1%}
-					<li>
-						<p class="text-muted"> &nbsp; <em>No more lists</em></p>
-					</li>
-					{% endif %}
+					
+				   
+				{% endif %}
 				{% endfor %}
+			    {% if lists | length == 1 %}
+				<li>
+					<p class="text-muted"> &nbsp; <em>No saved lists</em></p>
+				</li>
+				{% endif %}
 			</ul>
 		</div>
 	</div>
-
+	</div>
+   
 	<div class="col-sm-6 col-md-6 col-lg-5 col-md-offset-2">
 		<div class="btn-group pull-right">
 		
 			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#save"> 
-				<span class="glyphicon glyphicon-floppy-disk"></span>
+				<span class="glyphicon glyphicon-folder-close"></span>
 			</button>
 			
   		  	<button class="btn btn-default" data-toggle="modal" data-target="#delete_new">
