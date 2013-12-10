@@ -136,10 +136,25 @@ def profile():
     user = User.query.filter_by(id=session['user_id']).first()
     p1 = User.query.filter_by(email=user.partner1_email).first()
     p2 = User.query.filter_by(email=user.partner2_email).first()
-    unique_lists = Account.query.group_by(Account.list_name).\
+    unique_lists_u = Account.query.group_by(Account.list_name).\
                           filter_by(user_id=session['user_id']).\
-                          order_by(Account.trans_id).all()       
-    lists = [l.list_name for l in unique_lists] 
+                          order_by(Account.trans_id).all() 
+    
+    all_lists = unique_lists_u                      
+    if p1: 
+        unique_lists_p1 = Account.query.group_by(Account.list_name).\
+                          filter_by(user_id=p1.id).\
+                          order_by(Account.trans_id).all()
+        all_lists = all_lists + unique_lists_p1
+        
+    if p2: 
+        unique_lists_p2 = Account.query.group_by(Account.list_name).\
+                          filter_by(user_id=p2.id).\
+                          order_by(Account.trans_id).all() 
+        all_lists = all_lists + unique_lists_p2                      
+  
+    lists = list(set([l.list_name for l in all_lists]))                                       
+
     if "new" not in lists: lists.append(u"new")     
     
     form = DataForm(request.form)
