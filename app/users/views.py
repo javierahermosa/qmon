@@ -176,12 +176,36 @@ def profile():
             edit_data.description = form.description.data
             edit_data.edit = False
             db.session.add(edit_data)
+            db.session.commit()
         else:
             data = Account(user_id=session['user_id'], list_name=user.current_list, 
                            user_name=user.name, date=form.date.data, description=form.description.data, \
                            spent=form.amount.data, edit=False)
             db.session.add(data)
-        db.session.commit()
+            db.session.commit()
+            
+            unpay_lists = ExpenseList.query.filter_by(user_id=session['user_id'],list_name=user.current_list).all()
+
+            if p1: 
+                unpay_lists_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name=user.current_list).all()
+                unpay_lists = unpay_lists +  unpay_lists_p1
+
+            if p2: 
+                unpay_lists_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name=user.current_list).all()
+                unpay_lists = unpay_lists +  unpay_lists_p2
+            
+            
+            for li in unpay_lists:
+         
+                if li.payed:
+                    li.payed = False
+                    db.session.add(li)
+                    db.session.commit()
+                if li.received:
+                    li.received = False 
+                    db.session.add(li)   
+                    db.session.commit()
+        
         return redirect(url_for('users.profile'))
     
     # Save list as
@@ -208,7 +232,18 @@ def profile():
                                 archived=True, payed=list_u.payed, received=list_u.received)
         db.session.add(new_list_u)                      
         db.session.commit()
+
+        list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name="new").first()
+        new_list_u = ExpenseList(user_id=p1.id, list_name=form_save.list_name.data, \
+                                archived=True, payed=list_u.payed, received=list_u.received)
+        db.session.add(new_list_p1)                      
+        db.session.commit()
         
+        list_u = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
+        new_list_u = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
+                                archived=True, payed=list_u.payed, received=list_u.received)
+        db.session.add(new_list_p2)                      
+        db.session.commit()        
         
         list_u.payed = False
         db.session.add(list_u)
