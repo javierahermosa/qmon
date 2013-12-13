@@ -242,16 +242,19 @@ def profile():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('users.profile'))
-             
-    entries = Account.query.filter_by(user_id=session['user_id'], list_name=user.current_list).all()
+              
+    entries = Account.query.filter_by(user_id=session['user_id'], list_name=user.current_list) \
+                            .order_by(desc(Account.trans_id)).all()
     bal = check_balances(current_list=user.current_list)
     
     if p1:
-        p1_entries = Account.query.filter_by(user_id=p1.id, list_name=user.current_list).all()
+        p1_entries = Account.query.filter_by(user_id=p1.id, list_name=user.current_list) \
+                                   .order_by(desc(Account.trans_id)).all()
         entries = entries + p1_entries
         
     if p2:
-        p2_entries = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
+        p2_entries = Account.query.filter_by(user_id=p2.id, list_name=user.current_list) \
+                                  .order_by(desc(Account.trans_id)).all()
         entries = entries + p2_entries
             
     return render_template("users/profile.html", user=user, form=form, lists=lists, unique_listnames=unique_listnames, \
