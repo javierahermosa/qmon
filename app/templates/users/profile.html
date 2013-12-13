@@ -11,8 +11,9 @@
 	{% endif %}
 {% endwith %}
 
+
 <div class="row">
-	<div class="col-sm-3 col-md-4 col-lg-4">
+	<div class="col-xs-4 col-sm-5 col-md-4 col-lg-4">
 		
 		<h3 class="text-mutted text-left">  Add a new qomon expense! </h3>  
 		{% from "forms/macros.html" import render_field %}
@@ -31,20 +32,21 @@
             </div>
 			<p> &nbsp;</p>
             {% if user.current_list == "new" %}
-	  		<button type="submit" class="btn btn-success">Add to Current List</button>
+	  		<button type="submit" class="btn btn-success">Add</button>
 		    {% else %}
-		    <button type="submit" class="btn btn-success">Add to {{user.current_list}}</button>
+		    <button type="submit" class="btn btn-success disabled">Add</button>
 			{% endif %}
 		 </form>
     
 	 </div><!-- column-->
 	 
-     <div class="col-sm-5 col-md-6 col-lg-6 col-sm-offset-3 col-md-offset-1 col-lg-offset-1 "  style="background-color:#F0F0F0 ">
+     <div class="col-xs-5 col-sm-5 col-md-6 col-lg-6 col-xs-offset-2 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 "  style="background-color:#F0F0F0 ">
 	    <table class="table-responsive">
 			<tr>
 				<td><h3 class="text-left"><strong>{{user.name}}</strong> spent:&nbsp;&nbsp;</h3></td>
-				<td></td>
+				<td> </td>
 				<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_user'] }}</h3></td>
+				<td> </td>
 			</tr>
 			
 			{% if p1 %}
@@ -52,6 +54,7 @@
 				<td><h3 class="text-left"> <strong>{{p1.name}}</strong> spent: </h3></td>
 				<td>&nbsp;</td>
 				<td><h3 class="text-right">$ {{ '%.2f' % bal['ts_p1'] }}</h3></td>
+				<td> </td>
 			</tr>
 	        {% endif %}
 			
@@ -60,6 +63,7 @@
 				<td><h3 class="text-left"><strong>{{p2.name}}</strong>  spent: </h3></td>
 				<td>&nbsp;</td>
 				<td><h3 class="text-right">$ {{'%.2f' % bal['ts_p2'] }}</h3></td>
+				<td> </td>
 			</tr>
 			{% endif %}
 			
@@ -73,22 +77,33 @@
 			</tr>
 			{% endif %}
 			
-			{% if p1 and not p2 %}
+			{% if p1 and not p1 or p2 and not p1 %}
 			<tr>
 				<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver']}}:</em></h3></td>
 				<td></td>
 				<td class="text-warning">
 					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owned'] | abs() }}</strong></em></h3>
 				</td>
-				</tr>
-			{% endif %}
-			
-			{% if p2 and not p1%}
-			<tr>
-				<td><h3 class="text-left"><em>{{bal['ower2']}} owes {{bal['receiver']}}:</em></h3></td>
-				<td></td>
-				<td class="text-warning">
-					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['amount_owned2'] | abs() }}</strong></em></h3>
+				<h3 class="text-right">&nbsp;
+			    {% for li in lists %}
+					{% if  li.list_name == user.current_list and li.user_id == bal.ower_id %}
+						{% if li.payed %}
+			 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
+						href="{{ url_for('users.mark_payed',listname=li.list_name, 
+								 payed_by=bal.ower_id, payed_to=bal.receiver_id) }}">
+			 			<span class="glyphicon glyphicon-ok-circle"> 
+			 			</a> 
+						<td><h3 class="text-success">Paid</h3></td>
+						{% else %}
+			 			<a class="text-muted"  rel="tooltip" title="Mark as payed"
+						href="{{ url_for('users.mark_payed',listname=li.list_name, 
+						         payed_by=bal.ower_id, payed_to=bal.receiver_id) }}">
+			 			<span class="glyphicon glyphicon-ok-circle"> 
+			 			</a> 
+						{% endif %}
+					{% endif %}
+				{% endfor %}
+				</h3>
 				</td>
 			</tr>
 			{% endif %}
@@ -101,7 +116,30 @@
 				<td class="text-warning">
 					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owed1'] |abs() }}</strong></em></h3>
 				</td>
-				</tr>
+				<td style="vertical-align:middle">
+					<h3 class="text-right">&nbsp;
+				    {% for li in lists %}
+			
+						{% if  li.list_name == user.current_list and li.user_id == bal.receiver1_id %}
+							{% if li.received  %}
+				 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+							         payed_by=bal.ower_id, receiver=bal.receiver1_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							<td><h3 class="text-success">Paid</h3></td>
+							{% else %}
+				 			<a class="text-muted"  rel="tooltip" title="Mark as payed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+							         payed_by=bal.ower_id, receiver = bal.receiver1_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					</h3>
+				</td>
+			</tr>
 				
 			<tr>
 				<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver2']}}:</em></h3></td>
@@ -109,6 +147,29 @@
 				<td class="text-warning">
 					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['amount_owed2'] | abs() }}</strong></em></h3>
 				</td>
+				<td style="vertical-align:middle">
+					<h3 class="text-right">&nbsp;
+				    {% for li in lists %}
+						{% if  li.list_name == user.current_list and li.user_id == bal.receiver2_id %}
+							{% if li.received %}
+				 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+							         payed_by=bal.ower_id, receiver=bal.receiver2_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							<td><h3 class="text-success">Paid</h3></td>
+							{% else %}
+				 			<a class="text-muted"  rel="tooltip" title="Mark as payed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+							         payed_by=bal.ower_id, receiver=bal.receiver2_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					</h3>
+				</td>
+			   
 			</tr>	
 			{% elif bal['n_owers']==2 %}
 			<tr>
@@ -117,6 +178,29 @@
 				<td class="text-warning">
 					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owed1'] | abs() }}</strong></em></h3>
 				</td>
+				<td style="vertical-align:middle">
+					<h3 class="text-right">&nbsp;
+				    {% for li in lists %}
+						{% if  li.list_name == user.current_list and li.user_id == bal.ower1_id %}
+							{% if li.payed %}
+				 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+							         payed_by=bal.ower1_id, receiver = bal.receiver_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							<td><h3 class="text-success">Paid</h3></td>
+							{% else %}
+				 			<a class="text-muted"  rel="tooltip" title="Mark as payed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+							         payed_by=bal.ower1_id, receiver=bal.receiver_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					</h3>
+				</td>
+				
 				</tr>
 				
 			<tr>
@@ -124,6 +208,28 @@
 				<td></td>
 				<td class="text-warning">
 					<h3 class="text-right"><em><strong> $ {{'%.2f' % bal['amount_owed2'] | abs() }}</strong></em></h3>
+				</td>
+				<td style="vertical-align:middle">
+					<h3 class="text-right">&nbsp;
+				    {% for li in lists %}
+						{% if  li.list_name == user.current_list and li.user_id == bal.ower2_id %}
+							{% if li.payed %}
+				 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+									 payed_by=bal.ower2_id, receiver=bal.receiver_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							<td><h3 class="text-success">Paid</h3></td>
+							{% else %}
+				 			<a class="text-muted"  rel="tooltip" title="Mark as payed"
+							href="{{ url_for('users.mark_payed',listname=li.list_name, 
+									 payed_by=bal.ower2_id, receiver = bal.receiver_id) }}">
+				 			<span class="glyphicon glyphicon-ok-circle"> 
+				 			</a> 
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					</h3>
 				</td>
 			</tr>	
 			{% endif %}
@@ -159,54 +265,58 @@
 <div class="row">
 	<div class="col-sm-6 col-md-4 col-lg-">
 		<div class="btn-group pull-left">
-			<button type="button" class="btn btn-default"> My Lists </button>
 			
 			{% if user.current_list == "new" %}
-			<a class="btn btn-primary" href="{{ url_for('users.current_list',list_name='new') }}">Current</a>
+			<a class="btn btn-primary" href="{{ url_for('users.current_list',list_name='new') }}">Current List</a>
 			{% else %}
-			<a class="btn btn-default" href="{{ url_for('users.current_list',list_name='new') }}">Current</a>
+			<a class="btn btn-default" href="{{ url_for('users.current_list',list_name='new') }}">Current List</a>
 			{% endif %}
+			
 			<div class="btn-group">
 				
-			{% if user.current_list != "new" %}
-			<button type="button" class="btn btn-primary"> {{user.current_list}}</button>
+			{% if user.current_list == "new" %}
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 
+				Archived 
 			{% else %}
-			<button type="button" class="btn btn-default"> Archive </button>
-			{% endif %}
-				
-  		    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-    			<span class="caret"></span>
-    			<span class="sr-only">Toggle Dropdown</span>
-  	  		</button>
-  		  	<ul class="dropdown-menu" role="menu">
-				{% for list in lists %}
+			<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+				{{user.current_list}}
+			{% endif %}	
+				<span class="caret"></span>
+			</button>	
+			
+			<ul class="dropdown-menu" role="menu">
+			{% for list in unique_listnames %}
 				{% if list != "new" %}
-					<li>
-						<a href="{{ url_for('users.current_list',list_name=list) }}"
-						   data-target="#Save">{{list}}</a>
-					</li>
-					
-				   
-				{% endif %}
-				{% endfor %}
-			    {% if lists | length == 1 %}
 				<li>
-					<p class="text-muted"> &nbsp; <em>No saved lists</em></p>
+					<a href="{{ url_for('users.current_list',list_name=list) }}"
+					   data-target="#Save">{{list}}</a>
 				</li>
 				{% endif %}
-			</ul>
+			{% endfor %}
+			
+		    {% if unique_listnames | length == 1 %}
+			<li><p class="text-muted"> &nbsp; <em> No archived lists </em></p></li>
+			{% endif %}	
+			
 		</div>
 	</div>
 	</div>
    
-	<div class="col-sm-6 col-md-6 col-lg-5 col-md-offset-2">
+	<div class="col-sm-6 col-md-6 col-lg-6 col-md-offset-2">
 		<div class="btn-group pull-right">
-		
+	        {% if user.current_list == "new" %}	
 			<button type="button" class="btn btn-default" rel="tooltip" 
 			        title="Archive List &amp; Start New" data-toggle="modal" data-target="#save"> 
+				
 				<span class="glyphicon glyphicon-flash"></span>
 			</button>
-			
+			{% else %}
+			<button type="button" class="btn btn-default disabled" rel="tooltip" 
+			        title="Archive List &amp; Start New" data-toggle="modal" data-target="#save"> 
+				
+				<span class="glyphicon glyphicon-flash"></span>
+			</button>
+			{% endif %}
   		  	<button class="btn btn-default" rel="tooltip" 
 			         title="Delete List" data-toggle="modal" data-target="#delete_new">
 				<span class="glyphicon glyphicon-trash"></span>

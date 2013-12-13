@@ -30,7 +30,7 @@
    	 	   <ul class="nav nav-pills pull-right">
 				
 				<div class="btn-group">
-			 	   <li class="btn"><a href="{{ url_for('users.about') }}">About</a></li>
+					<a class="btn btn-default" href="{{ url_for('users.about') }}">About</a>
 			 	</div>
 				
 			 	{% if guser %}
@@ -49,14 +49,14 @@
 			    
 				{% if not guser %}
 			    <div class="btn-group">
-			 	   <li><a href="{{ url_for('users.login') }}">Log In</a></li>
+					<a class="btn btn-default" href="{{ url_for('users.login') }}">Log in</a>
 		 	  	</div>
 			 	{% endif %}
 		   </ul>
    	  	 
-		  <a href="{{ url_for('users.home') }}">
-			  <h2 class="muted">Qomon</h2>
-		  </a>
+		  
+		   <h2 class="muted"><a href="{{ url_for('users.home') }}">Qomon</a></h2>
+
    	</div> <!-- masthead -->
 	  
 	<hr> <!--horizontal line-->
@@ -66,7 +66,7 @@
 	  	  
 	{% block footer %}
  	<footer class="footer">
-		<p>Qomon is a Qbite production powered by 
+		<p>Qomon is powered by 
 			<a href="http://flask.pocoo.org/docs/">Flask</a>,
 			<a href="http://getbootstrap.com/">Bootstrap</a>,
 			<a href="http://glyphicons.com/"> Glyphicons</a>, and 

@@ -8,19 +8,18 @@ from sqlalchemy import func, desc
 from app import app
 from app import db
 from app.users.forms import RegisterForm, LoginForm, DataForm, SettingsForm, ListForm, PartnerForm
-from app.users.models import User
-from app.users.models import Account
+from app.users.models import User, Account, ExpenseList
 from app.users.decorators import requires_login
 
 mod = Blueprint('users', __name__, url_prefix='/users')  
 
 login_manager = LoginManager()
-
-
 login_manager.login_view = "users.login"
 login_manager.login_message = u"Please log in to access this page."
 login_manager.refresh_view = "reauth"
 login_manager.init_app(app)
+login_manager.login_view = "/login/"
+login_manager.setup_app(app)
   
 @login_manager.user_loader
 def load_user(user_id):
@@ -29,7 +28,7 @@ def load_user(user_id):
 @login_manager.token_loader
 def load_token(token):
     data = login_serializer.loads(token)
-    user = load_user(session['user_id'])
+    user = load_user(data[0])
     if user and data[1] == user.password:
         return user
     else: return None
@@ -65,10 +64,15 @@ def check_balances(current_list="new"):
          balances['ts'] = balances['ts_user'] + balances['ts_p1']
          if balances['ts_user'] < balances['ts_p1']:
              balances['ower'] = user.name
+             balances['ower_id'] = user.id
              balances['receiver'] = partner1.name
+             balances['receiver_id'] = partner1.id
+             
          else:
              balances['ower'] = partner1.name
+             balances['ower_id'] = partner1.id
              balances['receiver'] = user.name
+             balances['receiver_id'] = user.id
          balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p1'])    
          
     elif partner1 and partner2:
@@ -85,22 +89,33 @@ def check_balances(current_list="new"):
          balances['diff_p2'] = diff_p2
                   
          group = {user.name:diff_u, partner1.name:diff_p1, partner2.name:diff_p2}
+         group_id = {user.id:diff_u, partner1.id:diff_p1, partner2.id:diff_p2}
+         
          neg = [key for key in group.keys() if group[key] < 0]
          pos = [key for key in group.keys() if group[key] >= 0]
+         
+         neg_id = [key for key in group_id.keys() if group_id[key] < 0]
+         pos_id = [key for key in group_id.keys() if group_id[key] >= 0]
          
          balances['n_owers'] = len(neg)   
              
          if balances['n_owers'] == 1:
              balances['ower'] = neg[0]
+             balances['ower_id'] = neg_id[0]
              balances['amount_owed1'] = group[pos[0]]
              balances['amount_owed2'] = group[pos[1]]
              balances['receiver1'] = pos[0]
+             balances['receiver1_id'] = pos_id[0]
              balances['receiver2'] = pos[1]
+             balances['receiver2_id'] = pos_id[1]
              
          if balances['n_owers'] == 2:
              balances['receiver'] = pos[0]
+             balances['receiver_id'] = pos_id[0]
              balances['ower1'] = neg[0]
              balances['ower2'] = neg[1]
+             balances['ower1_id'] = neg_id[0]
+             balances['ower2_id'] = neg_id[1]
              balances['amount_owed1'] = group[neg[0]]
              balances['amount_owed2'] = group[neg[1]] 
                         
@@ -109,10 +124,14 @@ def check_balances(current_list="new"):
          
          if balances['ts_user'] < balances['ts_p2']:
              balances['ower'] = user.name
+             balances['ower_id'] = user.id
              balances['receiver'] = partner2.name
+             balances['receiver_id'] = partner2.id
          else:
              balances['ower'] = partner2.name
+             balances['ower_id'] = partner2.id
              balances['receiver'] = user.name
+             balances['receiver_id'] = user.id
          balances['amount_owned'] = 0.5 * (balances['ts_user'] - balances['ts_p2'])  
     else:
          balances['ts'] = balances['ts_user'] 
@@ -136,26 +155,16 @@ def profile():
     user = User.query.filter_by(id=session['user_id']).first()
     p1 = User.query.filter_by(email=user.partner1_email).first()
     p2 = User.query.filter_by(email=user.partner2_email).first()
-    unique_lists_u = Account.query.group_by(Account.list_name).\
-                          filter_by(user_id=session['user_id']).\
-                          order_by(Account.trans_id).all() 
     
-    all_lists = unique_lists_u                      
+    lists = ExpenseList.query.filter_by(user_id=session['user_id']).all()            
     if p1: 
-        unique_lists_p1 = Account.query.group_by(Account.list_name).\
-                          filter_by(user_id=p1.id).\
-                          order_by(Account.trans_id).all()
-        all_lists = all_lists + unique_lists_p1
-        
+        lists_p1 = ExpenseList.query.filter_by(user_id=p1.id).all()
+        lists = lists + lists_p1
     if p2: 
-        unique_lists_p2 = Account.query.group_by(Account.list_name).\
-                          filter_by(user_id=p2.id).\
-                          order_by(Account.trans_id).all() 
-        all_lists = all_lists + unique_lists_p2                      
-  
-    lists = list(set([l.list_name for l in all_lists]))                                       
-
-    if "new" not in lists: lists.append(u"new")     
+        lists_p2 = ExpenseList.query.filter_by(user_id=p2.id).all()
+        lists = lists + lists_p2
+    
+    unique_listnames = list(set([l.list_name for l in lists]))
     
     form = DataForm(request.form)
     if form.validate_on_submit(): 
@@ -168,8 +177,9 @@ def profile():
             edit_data.edit = False
             db.session.add(edit_data)
         else:
-            data = Account(user_id=session['user_id'], list_name=user.current_list, user_name=user.name, date=form.date.data, \
-                       description=form.description.data, spent=form.amount.data, edit=False)
+            data = Account(user_id=session['user_id'], list_name=user.current_list, 
+                           user_name=user.name, date=form.date.data, description=form.description.data, \
+                           spent=form.amount.data, edit=False)
             db.session.add(data)
         db.session.commit()
         return redirect(url_for('users.profile'))
@@ -177,15 +187,13 @@ def profile():
     # Save list as
     form_save = ListForm(request.form)
     if form_save.validate_on_submit():
-        # All elements in list
+        # Change list name in all entries in current list
         list_all = Account.query.filter_by(user_id=session['user_id'], list_name=user.current_list).all()
         if p1:
             list_p1 = Account.query.filter_by(user_id=p1.id, list_name=user.current_list).all()
             list_all = list_all + list_p1
-            if p2:
-                list_p2 = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
-                list_all = list_all + list_p2
-        if p2 and not p1:
+
+        if p2:
             list_p2 = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
             list_all = list_all + list_p2
                  
@@ -193,13 +201,44 @@ def profile():
             li.list_name = form_save.list_name.data
             db.session.add(li)
             db.session.commit()
-        user.current_list = "new"
-        db.session.add(user)
+        
+        # Add list
+        list_u = ExpenseList.query.filter_by(user_id=session['user_id'],list_name="new").first()
+        new_list_u = ExpenseList(user_id=session['user_id'], list_name=form_save.list_name.data, \
+                                archived=True, payed=list_u.payed, received=list_u.received)
+        db.session.add(new_list_u)                      
         db.session.commit()
-        if p1: p1.current_list = "new"
-        if p2: p2.current_list = "new"
-        db.session.add(user)
+        
+        
+        list_u.payed = False
+        db.session.add(list_u)
         db.session.commit()
+        if p1:
+            
+            list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name="new").first()
+            new_list_p1 = ExpenseList(user_id=p1.id, list_name=form_save.list_name.data, \
+                               archived=True, payed=list_p1.payed, received=list_p1.received)
+            db.session.add(new_list_p1)
+            db.session.commit()
+            
+            
+            list_p1.payed = False
+            db.session.add(list_p1)
+            db.session.commit()
+            
+            if p2: 
+                list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
+                new_list_p2 = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
+                               archived=True, payed=list_p2.payed, received=list_p2.received)
+                db.session.add(new_list_p2)
+                db.session.commit()
+                
+                
+                list_p2.payed = False
+                db.session.add(list_p2)
+                db.session.commit()
+                
+        user.current_list = form_save.list_name.data
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('users.profile'))
@@ -210,15 +249,13 @@ def profile():
     if p1:
         p1_entries = Account.query.filter_by(user_id=p1.id, list_name=user.current_list).all()
         entries = entries + p1_entries
-        if p2:
-            p2_entries = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
-            entries = entries + p2_entries
-    if p2 and not p1:
+        
+    if p2:
         p2_entries = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
         entries = entries + p2_entries
             
-    return render_template("users/profile.html", user=user, form=form, \
-                             lists=lists, form_save = form_save, entries=entries, bal=bal, p1=p1, p2=p2, guser=g.user)
+    return render_template("users/profile.html", user=user, form=form, lists=lists, unique_listnames=unique_listnames, \
+           form_save = form_save, entries=entries, bal=bal, p1=p1, p2=p2, guser=g.user)
  
 @mod.before_request
 def before_request():
@@ -264,7 +301,12 @@ def register():
             db.session.commit()
             session['user_id'] = user.id
             flash('Thanks for registering')
+            
+            first_list = ExpenseList(user_id=session['user_id'], list_name="new")
+            db.session.add(first_list)
+            db.session.commit()
             return redirect(url_for('users.profile'))
+        
     return render_template("users/register.html", form=form)
 
 @mod.route('/logout')
@@ -338,14 +380,14 @@ def settings():
                 db.session.add(user)
                 db.session.commit()
                 flash("Your Partner 1 info has been succesfully updated.", "add-partner")
-            
+          
         if pform.partner2.data:
              if pform.partner2.data != user.partner1_email and pform.partner2.data != user.partner2_email:    
                 user.partner2_email = pform.partner2.data   
                 db.session.add(user)
                 db.session.commit()
                 flash("Your Partner 2 info has been succesfully updated.", "add-partner")
-        
+             
         return redirect(url_for('users.settings'))              
     return render_template("users/settings.html", user=user, guser=g.user, form=form, pform=pform)
      
@@ -369,22 +411,48 @@ def delete_new():
     user = User.query.filter_by(id=session['user_id']).first()
     p1 = User.query.filter_by(email=user.partner1_email).first()
     p2 = User.query.filter_by(email=user.partner2_email).first()
+    list_u = ExpenseList.query.filter_by(user_id=session['user_id'],list_name=user.current_list).first()
+    if p1: list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name=user.current_list).first()
+    if p2: list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name=user.current_list).first()
     
     trans = Account.query.filter_by(user_id=session['user_id'], list_name=user.current_list).all()
     if p1: 
         trans_p1 = Account.query.filter_by(user_id=p1.id, list_name=user.current_list).all()
         trans = trans + trans_p1
-        if p2: 
-            trans_p2 = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
-            trans = trans + trans_p2
             
-    for tran in trans:
-        db.session.delete(tran)
-        db.session.commit()
+    if p2: 
+        trans_p2 = Account.query.filter_by(user_id=p2.id, list_name=user.current_list).all()
+        trans = trans + trans_p2
     
+    if trans:           
+        for tran in trans:
+            db.session.delete(tran)
+            db.session.commit()
+        
     user.current_list = "new"
     db.session.add(user)
     db.session.commit()
+    
+    if p1: 
+        p1.current_list = "new"
+        db.session.add(p1)
+        db.session.commit()
+    if p2: 
+        p1.current_list = "new"
+        db.session.add(p2)
+        db.session.commit()
+    
+    db.session.delete(list_u)
+    db.session.commit()
+    if p1: 
+        if list_p1: 
+            db.session.delete(list_p1)
+            db.session.commit()
+    if p2: 
+        if list_p2: 
+            db.session.delete(list_p2)
+            db.session.commit()
+    
     return redirect(url_for('users.profile'))
     
 @requires_login
@@ -409,5 +477,26 @@ def delete_partner(partner_email):
     db.session.commit()
     return redirect(url_for('users.settings'))
     
-
+@requires_login
+@mod.route('/mark_payed/<listname>/<payed_by>/<receiver>')
+def mark_payed(listname, payed_by, receiver):
+    user = User.query.filter_by(id=session['user_id']).first()
+    p1 = User.query.filter_by(email=user.partner1_email).first()
+    p2 = User.query.filter_by(email=user.partner2_email).first()
+            
+    lis = ExpenseList.query.filter_by(user_id=payed_by,list_name=listname).first()   
+    if lis.payed:
+        lis.payed = False
+    else:    
+        lis.payed = True
+    db.session.add(lis)
+    db.session.commit()
     
+    lis_r = receiver = ExpenseList.query.filter_by(user_id=receiver,list_name=listname).first() 
+    if lis_r.received:
+        lis_r.received = False
+    else: 
+        lis_r.received = True       
+    db.session.add(lis_r)
+    db.session.commit()
+    return redirect(url_for('users.profile'))
