@@ -77,27 +77,28 @@
 			</tr>
 			{% endif %}
 			
-			{% if p1 and not p1 or p2 and not p1 %}
+			{% if (p1 and not p2) or (p2 and not p1) %}
 			<tr>
 				<td><h3 class="text-left"><em>{{bal['ower']}} owes {{bal['receiver']}}:</em></h3></td>
 				<td></td>
 				<td class="text-warning">
 					<h3 class="text-right"><em><strong> $ {{ '%.2f' % bal['amount_owned'] | abs() }}</strong></em></h3>
 				</td>
+				<td style="vertical-align:middle">
 				<h3 class="text-right">&nbsp;
 			    {% for li in lists %}
 					{% if  li.list_name == user.current_list and li.user_id == bal.ower_id %}
 						{% if li.payed %}
 			 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
 						href="{{ url_for('users.mark_payed',listname=li.list_name, 
-								 payed_by=bal.ower_id, payed_to=bal.receiver_id) }}">
+								 payed_by=bal.ower_id, receiver=bal.receiver_id) }}">
 			 			<span class="glyphicon glyphicon-ok-circle"> 
 			 			</a> 
 						<td><h3 class="text-success">Paid</h3></td>
 						{% else %}
 			 			<a class="text-muted"  rel="tooltip" title="Mark as payed"
 						href="{{ url_for('users.mark_payed',listname=li.list_name, 
-						         payed_by=bal.ower_id, payed_to=bal.receiver_id) }}">
+						         payed_by=bal.ower_id, receiver=bal.receiver_id) }}">
 			 			<span class="glyphicon glyphicon-ok-circle"> 
 			 			</a> 
 						{% endif %}
