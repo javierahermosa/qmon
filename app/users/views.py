@@ -194,9 +194,7 @@ def profile():
                 unpay_lists_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name=user.current_list).all()
                 unpay_lists = unpay_lists +  unpay_lists_p2
             
-            
             for li in unpay_lists:
-         
                 if li.payed:
                     li.payed = False
                     db.session.add(li)
@@ -234,13 +232,13 @@ def profile():
         db.session.commit()
 
         list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name="new").first()
-        new_list_u = ExpenseList(user_id=p1.id, list_name=form_save.list_name.data, \
+        new_list_p1 = ExpenseList(user_id=p1.id, list_name=form_save.list_name.data, \
                                 archived=True, payed=list_u.payed, received=list_u.received)
         db.session.add(new_list_p1)                      
         db.session.commit()
         
-        list_u = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
-        new_list_u = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
+        list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
+        new_list_p2 = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
                                 archived=True, payed=list_u.payed, received=list_u.received)
         db.session.add(new_list_p2)                      
         db.session.commit()        
