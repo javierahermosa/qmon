@@ -20,7 +20,11 @@ login_manager.refresh_view = "reauth"
 login_manager.init_app(app)
 login_manager.login_view = "/login/"
 login_manager.setup_app(app)
-  
+
+@mod.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'ico/favicon.ico')
+    
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.filter_by(id=user_id).first()
