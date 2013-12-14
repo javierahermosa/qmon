@@ -149,10 +149,6 @@ def home():
         g.user = User.query.get(session['user_id'])
         flash("user is logged")
     return render_template("index.html", guser=g.user)
-
-@mod.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'ico/qbite.ico')
     
 @mod.route('/profile/', methods=['GET', 'POST'])
 @requires_login
@@ -230,51 +226,38 @@ def profile():
             db.session.commit()
         
         # Add list
+        
         list_u = ExpenseList.query.filter_by(user_id=session['user_id'],list_name="new").first()
         new_list_u = ExpenseList(user_id=session['user_id'], list_name=form_save.list_name.data, \
-                                archived=True, payed=list_u.payed, received=list_u.received)
+                            archived=True, payed=list_u.payed, received=list_u.received)
         db.session.add(new_list_u)                      
-        db.session.commit()
-
-        list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name="new").first()
-        new_list_p1 = ExpenseList(user_id=p1.id, list_name=form_save.list_name.data, \
-                                archived=True, payed=list_u.payed, received=list_u.received)
-        db.session.add(new_list_p1)                      
-        db.session.commit()
-        
-        list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
-        new_list_p2 = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
-                                archived=True, payed=list_u.payed, received=list_u.received)
-        db.session.add(new_list_p2)                      
-        db.session.commit()        
+        db.session.commit()      
         
         list_u.payed = False
         db.session.add(list_u)
         db.session.commit()
+        
         if p1:
-            
             list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name="new").first()
             new_list_p1 = ExpenseList(user_id=p1.id, list_name=form_save.list_name.data, \
                                archived=True, payed=list_p1.payed, received=list_p1.received)
             db.session.add(new_list_p1)
             db.session.commit()
             
-            
             list_p1.payed = False
             db.session.add(list_p1)
             db.session.commit()
             
-            if p2: 
-                list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
-                new_list_p2 = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
+        if p2: 
+            list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name="new").first()
+            new_list_p2 = ExpenseList(user_id=p2.id, list_name=form_save.list_name.data, \
                                archived=True, payed=list_p2.payed, received=list_p2.received)
-                db.session.add(new_list_p2)
-                db.session.commit()
+            db.session.add(new_list_p2)
+            db.session.commit()
                 
-                
-                list_p2.payed = False
-                db.session.add(list_p2)
-                db.session.commit()
+            list_p2.payed = False
+            db.session.add(list_p2)
+            db.session.commit()
                 
         user.current_list = form_save.list_name.data
         db.session.add(user)
@@ -452,6 +435,7 @@ def delete_new():
     user = User.query.filter_by(id=session['user_id']).first()
     p1 = User.query.filter_by(email=user.partner1_email).first()
     p2 = User.query.filter_by(email=user.partner2_email).first()
+    
     list_u = ExpenseList.query.filter_by(user_id=session['user_id'],list_name=user.current_list).first()
     if p1: list_p1 = ExpenseList.query.filter_by(user_id=p1.id,list_name=user.current_list).first()
     if p2: list_p2 = ExpenseList.query.filter_by(user_id=p2.id,list_name=user.current_list).first()
@@ -482,15 +466,17 @@ def delete_new():
         p1.current_list = "new"
         db.session.add(p2)
         db.session.commit()
+
     
-    db.session.delete(list_u)
-    db.session.commit()
+    if list_u and list_u.list_name != "new":
+        db.session.delete(list_u)
+        db.session.commit()
     if p1: 
-        if list_p1: 
+        if list_p1 and list_p1.list_name != "new": 
             db.session.delete(list_p1)
             db.session.commit()
     if p2: 
-        if list_p2: 
+        if list_p2 and list_p2.list_name != "new": 
             db.session.delete(list_p2)
             db.session.commit()
     

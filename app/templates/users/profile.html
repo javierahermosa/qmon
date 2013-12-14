@@ -395,7 +395,7 @@
 	 	   <td> {{loop.index}} </td>
 	 	   <td> {{entry.user_name}} </td>
 	 	   
-	 	   {% if entry.edit %}
+	 	   {% if entry.edit and entry.user_id == user.id %}
 	 	   		<form role="form" class="form form-medium" 
 				      action="{{ url_for('users.profile') }}" method="post">
 	 				{{ form.csrf_token }}
