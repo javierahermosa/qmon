@@ -32,9 +32,9 @@
             </div>
 			<p> &nbsp;</p>
             {% if user.current_list == "new" %}
-	  		<button type="submit" class="btn btn-success">Add</button>
+	  		<button type="submit" class="btn btn-success" name="btn" value="add">Add</button>
 		    {% else %}
-		    <button type="submit" class="btn btn-success disabled">Add</button>
+		    <button type="submit" class="btn btn-success disabled" value="add">Add</button>
 			{% endif %}
 		 </form>
     
@@ -120,7 +120,6 @@
 				<td style="vertical-align:middle">
 					<h3 class="text-right">&nbsp;
 				    {% for li in lists %}
-			
 						{% if  li.list_name == user.current_list and li.user_id == bal.receiver1_id %}
 							{% if li.received  %}
 				 			<a class="text-success" rel="tooltip" title="Mark as unpayed"
@@ -307,19 +306,19 @@
 		<div class="btn-group pull-right">
 	        {% if user.current_list == "new" %}	
 			<button type="button" class="btn btn-default" rel="tooltip" 
-			        title="Archive List &amp; Start New" data-toggle="modal" data-target="#save"> 
+			        title="Archive List &amp; Start New" data-toggle="modal" role="dialog" data-target="#save"> 
 				
 				<span class="glyphicon glyphicon-flash"></span>
 			</button>
 			{% else %}
 			<button type="button" class="btn btn-default disabled" rel="tooltip" 
-			        title="Archive List &amp; Start New" data-toggle="modal" data-target="#save"> 
+			        title="Archive List &amp; Start New" data-toggle="modal" role="dialog" data-target="#save"> 
 				
 				<span class="glyphicon glyphicon-flash"></span>
 			</button>
 			{% endif %}
   		  	<button class="btn btn-default" rel="tooltip" 
-			         title="Delete List" data-toggle="modal" data-target="#delete_new">
+			         title="Delete List" data-toggle="modal"  role="dialog" data-target="#delete_new">
 				<span class="glyphicon glyphicon-trash"></span>
 			</button>
 		</div>
@@ -328,7 +327,7 @@
 
 
 <!-- Modal Delete List -->
-<div class="modal fade" id="delete_new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="delete_new" tabindex="-1" role="dialog" aria-labelledby="deletemodal" aria-hidden="true">
    <div class="modal-dialog">
      <div class="modal-content">
        <div class="modal-header">
@@ -336,7 +335,7 @@
          <h3 class="modal-title" id="myModalLabel">Warning! </h3>
        </div>
        <div class="modal-body">
-         <h4>Are you sure that you want to <strong>clear all entries </strong> in this list?</h4>
+         <h4>Are you sure that you want to <strong>clear all entries </strong> in {{user.current_list}}?</h4>
        </div>
        <div class="modal-footer">
          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -349,7 +348,7 @@
  
 
 <!-- Modal Save List -->
-<div class="modal fade" id="save" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="save" tabindex="-1" role="dialog" aria-labelledby="savemodal" aria-hidden="true">
    <div class="modal-dialog">
      <div class="modal-content">
        <div class="modal-header">
@@ -367,7 +366,7 @@
       	<div class="modal-footer">
          	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 		 	<a href="#">
-		  	  <button class="btn btn-success">Archive List</button></a> 
+		  	  <button class="btn btn-success" name="btn" value="archive">Archive List</button></a> 
        	</div>
       </form>
 	  
@@ -377,7 +376,8 @@
 
 <p>&nbsp;<p>
 
-<table class="table table-responsive table-striped tablesorter" id="account-table">
+<table onunload="unloadP('.')" onload="loadP('.')" 
+       class="table table-responsive table-striped tablesorter" id="account-table">
 	<thead>
 		<tr>
 			<th>#</th>
@@ -396,19 +396,24 @@
 	 	   <td> {{entry.user_name}} </td>
 	 	   
 	 	   {% if entry.edit and entry.user_id == user.id %}
-	 	   		<form role="form" class="form form-medium" 
+	 	   		<form role="form" class="form form-medium" name="btn" value="add"
 				      action="{{ url_for('users.profile') }}" method="post">
 	 				{{ form.csrf_token }}
      			   <td class="text-center"> 
-	 					{{ render_field(form.date, class="form-control input text-center datepicker", value=entry.date) }}
+	 					{{ render_field(form.date,  
+						   class="form-control input text-center datepicker", value=entry.date) }}
 	 				</td>
 	 				<td class="text-center"> 
-	 					{{ render_field(form.description, class="form-control input text-center", value=entry.description) }}
+	 					{{ render_field(form.description,
+						   class="form-control input text-center", value=entry.description) }}
 	 				</td>
 	 				<td class="text-right"> 
-	 					{{ render_field(form.amount, class="form-control input text-right", value= '%.2f' % entry.spent) }} 
+	 					{{ render_field(form.amount,
+						   class="form-control input text-right", value= '%.2f' % entry.spent) }} 
 	 				</td>	
-	 				<td class="text-right"><button type="submit" class="btn btn-info">Edit</button></td>
+	 				<td class="text-right">
+						<button type="submit" name="btn" value="add" class="btn btn-info">Edit</button>
+					</td>
  	 		  	</form>
 	 		
 	 	   {% else %}
@@ -459,7 +464,8 @@
     </tbody>
 	
 </table>
-	
+
+<script> var saveformErrors = {% if form_save.errors %}true{% else %}false{% endif %}; </script> 
 {% endblock %}
 
 

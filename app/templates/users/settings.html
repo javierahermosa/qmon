@@ -34,7 +34,8 @@
 	   	   	   	<tr>	
 		   	  	   	<td style="vertical-align:middle"> Member Name </td>
 		      		<td> 
-		   	  		   {{ render_field(form.change_name, class="form-control input-medium", value=user.name) }} 
+		   	  		   {{ render_field(form.change_name, class="form-control input-medium", 
+					                    value=user.name, autocomplete="off") }} 
 		   	  	    </td>
 	       	    </tr>
 		   	    <tr>
